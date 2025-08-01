@@ -1,0 +1,105 @@
+{% extends "userhome.html" %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}{% endblock %}
+
+{% block main %}{% endblock %}
+
+{% block outermain %}{% endblock %}
+
+{% block top_campaigns %}
+
+{% comment %} <div class="container mt-4"> {% endcomment %}
+
+    {% if messages %}
+  <div style="margin-bottom: 20px;">
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
+           role="alert" 
+           style="border-radius: 8px; font-weight: 500;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+  <div class="card shadow border-0">
+    <div class="card-header text-white d-flex justify-content-between align-items-center bg-success">
+      <h5 class="mb-0">📄 Uploaded Email Lists</h5>
+      <a href="/add_list/" class="btn btn-light btn-sm">
+        <i class="bi bi-plus-circle"></i> Add List
+      </a>
+    </div>
+    <div class="card-body p-0">
+
+      <div class="table-responsive">
+
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>List Name</th>
+            <th>File</th>
+            <th>Uploaded At</th>
+            <th>Actions</th>
+          </tr>
+
+          </thead>
+          <tbody>
+            {% for list in lists %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ list.list_name }}</td>
+
+            <td>
+              <a href="{{ list.file.url }}" target="_blank">Download</a>
+            </td>
+
+            <td>{{ list.uploaded_at|date:"d M Y, H:i A" }}</td>
+
+            {% comment %} <td>
+              <a href="/edit_email_list/{{ list.id }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-pencil-square"></i>
+              </a>
+              <a href="/delete_email_list/{{ list.id }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this list ?')">
+                <i class="bi bi-trash"></i>
+              </a>
+            </td> {% endcomment %}
+
+                  <td style="display: flex; gap: 6px;">
+        <a href="/edit_email_list/{{ list.id }}" 
+          class="btn" 
+          title="Edit"
+          style="background-color: #37AFE1; color: white; min-width: 36px; height: 36px; padding: 6px 10px; font-size: 14px; display: flex; align-items: center; justify-content: center; border: none;">
+          <i class="bi bi-pencil-square"></i>
+        </a>
+
+        <a href="/delete_list_user/{{ list.id }}" 
+          class="btn" 
+          title="Delete"
+          onclick="return confirm('Delete this list ?')"
+          style="background-color: #dc3545; color: white; min-width: 36px; height: 36px; padding: 6px 10px; font-size: 14px; display: flex; align-items: center; justify-content: center; border: none;">
+          <i class="bi bi-trash"></i>
+        </a>
+      </td> 
+                  
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="text-muted">No email lists uploaded.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% comment %} </div> {% endcomment %}
+
+{% endblock %}
+
+
+

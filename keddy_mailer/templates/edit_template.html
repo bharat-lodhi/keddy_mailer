@@ -1,0 +1,62 @@
+{% extends "userhome.html" %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}
+{% endblock %}
+{% block top_campaigns %} {% endblock %}
+
+{% block main %}
+
+<script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
+
+
+<div class="container" style="max-width: 900px;">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} mb-3" role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="card shadow border-0">
+    <div class="card-header text-white" style="background: #3B82F6">
+      <h5 class="mb-0">Edit Template</h5>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="card-body">
+
+        <div class="form-floating mb-4">
+          <input type="text" name="template_name" class="form-control" id="templateName" placeholder=" " required value="{{ template.template_name }}">
+          <label for="templateName" style="font-weight:bolder; color:gray;">Template Name</label>
+        </div>
+
+        <div class="form-floating">
+          {% comment %} <textarea name="content" class="form-control" id="templateContent" style="height: 300px;" placeholder=" " required>{{ template.content }}</textarea> {% endcomment %}
+          <textarea name="content" id="templateContent">{{ template.content|safe }}</textarea>
+          {% comment %} <label for="templateContent">Template Content</label> {% endcomment %}
+        </div>
+        
+
+        
+      </div>
+      <div class="card-footer d-flex justify-content-between">
+        <a href="/template_list/" class="btn btn-secondary">← Back</a>
+        <button type="submit" class="btn btn-success">Update Template</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+    <script>
+         CKEDITOR.replace('templateContent');
+    </script>
+
+{% endblock %}

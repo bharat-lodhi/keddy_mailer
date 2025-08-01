@@ -1,0 +1,67 @@
+{% extends "adminhome.html" %}
+
+
+{% block summary_content %}{% endblock %}
+
+{% block outermain %}{% endblock %}
+
+{% block main %}{% endblock %}
+
+{% block top_campaigns %}
+
+<div class="container mt-4">
+  <div class="card shadow border-0">
+    <div class="card-header bg-success text-white">
+      <h5 class="mb-0">Edit Admin Profile</h5>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="card-body row g-3">
+
+        <div class="col-md-6">
+          <label class="form-label">Name</label>
+          <input type="text" name="name" class="form-control" value="{{ admin.name }}" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" value="{{ admin.email }}" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Phone Number</label>
+          <input type="text" name="number" class="form-control" value="{{ admin.number }}" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Date of Birth</label>
+          <input type="date" name="dob" class="form-control" value="{{ admin.dob|date:'Y-m-d' }}" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Company</label>
+          <input type="text" name="company" class="form-control" value="{{ admin.company }}">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Profile Picture</label>
+          <input type="file" name="profile_image" class="form-control">
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Address</label>
+          <textarea name="address" class="form-control" rows="2">{{ admin.address }}</textarea>
+        </div>
+      </div>
+
+      <div class="card-footer text-end">
+        <a href="{% url 'admin_profile' %}" class="btn btn-secondary">← Cancel</a>
+        <a href="/change_admin_password/" class="btn btn-danger">Change Password</a>
+        <button type="submit" class="btn btn-success">Update Profile</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

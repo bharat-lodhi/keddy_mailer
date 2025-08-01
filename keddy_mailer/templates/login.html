@@ -1,0 +1,287 @@
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #283EFA, #00C6FB);
+      font-family: Arial, sans-serif;
+    }
+    .container-box {
+      max-width: 900px;
+      margin: 5rem auto;
+      display: flex;
+      background: #f5f5f5;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(0,0,0,0.2);
+    }
+    .left-box {
+      background: linear-gradient(to bottom, #3a0ca3, #4361ee);
+      color: #fff;
+      flex: 1;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .left-box h2 {
+      margin-top: 20px;
+    }
+    .right-box {
+      flex: 2;
+      padding: 50px 40px;
+    }
+    .password-toggle {
+      position: absolute;
+      right: 15px;
+      top: 46%;
+      transform: translateY(-50%);
+      cursor: pointer;
+    }
+    .error {
+      color: red;
+      font-size: 0.85rem;
+    }
+    .position-relative .form-control {
+      padding-right: 2.5rem;
+    }
+    .login-btn {
+      width: 100%;
+    }
+    .register-link {
+      text-align: center;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container-box">
+  <div class="left-box">
+    <img src="https://cdn-icons-png.flaticon.com/512/727/727399.png" width="60">
+    <h2>Welcome Back</h2>
+    <p>Login to your account and get started!</p>
+    <a href="/register/" class="btn btn-light mt-3">Register</a>
+  </div>
+
+  <div class="right-box">
+    {% if msg %}
+      <div class="alert alert-danger">{{ msg }}</div>
+    {% endif %}
+
+    <h3 class="mb-4">Login</h3>
+    <form id="loginForm" method="post" novalidate>
+      {% csrf_token %}
+      <div class="mb-3">
+        <input type="email" class="form-control" id="email" placeholder="Email" name="email" required>
+        <div class="error" id="emailError"></div>
+      </div>
+      <div class="mb-3 position-relative">
+        <input type="password" class="form-control" id="password" placeholder="Password" name="password" required>
+        <span class="password-toggle" onclick="togglePassword('password')">👁️</span>
+        <div class="error" id="passwordError"></div>
+      </div>
+      <input type="submit" value="Login" class="btn btn-primary login-btn">
+      <div class="register-link"><a href="/register/">Don't have an account? Register</a></div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function togglePassword(id) {
+    const input = document.getElementById(id);
+    input.type = input.type === "password" ? "text" : "password";
+  }
+
+  document.getElementById("loginForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    let valid = true;
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+
+    document.getElementById("emailError").textContent = "";
+    document.getElementById("passwordError").textContent = "";
+
+    if (!/^\S+@\S+\.\S+$/.test(email.value.trim())) {
+      document.getElementById("emailError").textContent = "Please enter a valid email.";
+      valid = false;
+    }
+
+    if (password.value.trim() === "") {
+      document.getElementById("passwordError").textContent = "Please enter your password.";
+      valid = false;
+    }
+
+    if (valid) {
+      this.submit();  // Submit form if all fields are valid
+    }
+  });
+</script>
+
+</body>
+</html> {% endcomment %}
+
+
+
+
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: url('https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+      background-size: cover;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .form-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      color: #fff;
+    }
+    .form-control {
+      background: transparent;
+      border: 1px solid #ccc;
+      color: white;
+    }
+    .form-control:focus {
+      background: transparent;
+      color: white;
+      box-shadow: none;
+      border-color: #ddd;
+    }
+    label {
+      color: #ddd;
+    }
+    .btn-custom {
+      background: #007bff;
+      border: none;
+      width: 100%;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-card">
+    <h3 class="text-center mb-4">Login</h3>
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label>Email</label>
+        <input type="email" class="form-control" placeholder="Enter your email" name="email">
+      </div>
+      <div class="mb-4">
+        <label>Password</label>
+        <input type="password" class="form-control" placeholder="Enter your password" name="password">
+      </div>
+      <button type="submit" class="btn btn-custom">Login</button>
+    </form>
+  </div>
+</body>
+</html> {% endcomment %}
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: url('https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+      background-size: cover;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .form-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      color: #fff;
+    }
+    .form-control {
+      background: transparent;
+      border: 1px solid #ccc;
+      color: white;
+    }
+    .form-control:focus {
+      background: transparent;
+      color: white;
+      box-shadow: none;
+      border-color: #ddd;
+    }
+    label {
+      color: #ddd;
+    }
+    .btn-custom {
+      background: #007bff;
+      border: none;
+      width: 100%;
+      color: white;
+    }
+
+    .btn-link-light {
+      color: #ddd;
+      text-decoration: underline;
+      display: inline-block;
+      margin-top: 0.8rem;
+    }
+    .btn-link-light:hover {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-card">
+
+    <div class="right-box">
+    {% if msg %}
+      <div class="alert alert-danger">{{ msg }}</div>
+    {% endif %}
+
+    <h3 class="text-center mb-4">Login</h3>
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label>Email</label>
+        <input type="email" class="form-control" placeholder="Enter your email" name="email">
+      </div>
+      <div class="mb-4">
+        <label>Password</label>
+        <input type="password" class="form-control" placeholder="Enter your password" name="password">
+      </div>
+      <button type="submit" class="btn btn-custom">Login</button>
+
+      <!-- Extra Links -->
+      <div class="text-center">
+        <a href="{% url 'register' %}" class="btn-link-light">Create an account</a><br>
+        <a href="/" class="btn-link-light">Back to Home</a>
+      </div>
+
+    </form>
+  </div>
+</body>
+</html>

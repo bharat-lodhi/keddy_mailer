@@ -1,0 +1,80 @@
+{% extends "adminhome.html" %}
+
+{% block summary_content %}{% endblock %}
+{% block outermain %}{% endblock %}
+{% block main %}{% endblock %}
+
+{% block top_campaigns %}
+<div class="card shadow">
+  <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">All SMTP Servers</h5>
+    <span class="badge bg-light text-dark">Total: {{ servers|length }}</span>
+  </div>
+  <div class="card-body">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Server Name</th>
+            <th>From Email</th>
+            <th>User</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in servers %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ s.name }}</td>
+            <td>{{ s.from_email }}</td>
+           <td>
+                {% with s_user=s.user_id %}
+                    {% if not s_user %}
+                    <span class="text-muted fst-italic">Unknown</span>
+                    {% else %}
+                    {% for u in users %}
+                        {% if u.uid == s_user %}
+                        {{ u.name }}
+                        {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                </td>
+<td>
+<a href="{% url 'toggle_smtp_status' s.id %}" class="text-decoration-none">
+  {% if s.is_active == 1 %}
+    <span class="badge bg-success">Verified</span>
+  {% else %}
+    <span class="badge bg-secondary">Not Verified</span>
+  {% endif %}
+</a>
+</td>
+
+<td>{{ s.created_at|date:"M d, Y H:i" }}</td>
+
+<td>
+  <a href="{% url 'edit_smtp_admin' s.id %}" class="btn btn-sm btn-warning">
+    <i class="bi bi-pencil"></i> Edit
+  </a>
+  <a href="{% url 'delete_server_admin' s.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure to delete this SMTP?')">
+    <i class="bi bi-trash"></i> Delete
+  </a>
+</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="text-center">No SMTP servers found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,294 @@
+{% extends "userhome.html" %}
+
+{% load static %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}
+{% endblock %}
+
+{% block outermain %}{% endblock %}
+{% block main %} {% endblock %}
+{% comment %} {% block top_campaigns %} {% endblock %} {% endcomment %}
+
+{% comment %} {% block main %}
+<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
+
+<style>
+  :root {
+    --primary-color: #10b981;
+    --primary-hover: #0e9e72;
+    --border-color: #b8bdbb;
+    --text-color: #1e293b;
+    --bg-light: #f0fdf4;
+    --transition: 0.3s ease;
+    --border-radius: 8px;
+  }
+
+.custom-form-container {
+  background: white;
+  max-width: 1100px;
+  padding: 30px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+  h2 {
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 600;
+  }
+
+  #heading1{
+    font-weight:bold;
+  }
+
+  .form-group {
+    position: relative;
+    margin-bottom: 25px;
+  }
+
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 12px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 15px;
+    background: transparent;
+    color: var(--text-color);
+    transition: var(--transition);
+  }
+
+  .form-group select {
+    appearance: none;
+    background-color: white;
+  }
+
+  .form-group label {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: white;
+    padding: 0 6px;
+    color: #6b7280;
+    font-size: 14px;
+    transition: 0.2s ease;
+    pointer-events: none;
+  }
+
+  .form-group input:focus + label,
+  .form-group input:not(:placeholder-shown) + label,
+  .form-group select:focus + label,
+  .form-group select:not([value=""]) + label {
+    top: -10px;
+    left: 8px;
+    font-size: 12px;
+    color: var(--primary-color);
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    outline: none;
+  }
+
+  /* ✳️ CKEditor Section: Keep as original */
+  textarea {
+    width: 100%;
+    height: 300px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: sans-serif;
+  }
+
+  .btn-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .btn1 {
+    padding: 12px 22px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    transition: var(--transition);
+  }
+
+  .btn-save {
+    background-color: var(--primary-color);
+    color: white;
+  }
+
+  .btn-save:hover {
+    background-color: var(--primary-hover);
+  }
+
+  .btn-cancel {
+    background-color: #e5e7eb;
+    color: var(--text-color);
+  }
+
+  @media (max-width: 600px) {
+    .btn-group {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+</style>
+
+<div class="custom-form-container">
+
+  {% if messages %}
+  <div style="margin-bottom: 20px;">
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
+           role="alert" 
+           style="border-radius: 8px; font-weight: 500;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+  <h2 id="heading1">Create Email Template</h2>
+  <form id="templateForm" method="post">
+    {% csrf_token %}
+
+    <!-- Template Name -->
+    <div class="form-group">
+      <input type="text" id="templateName" name="template_name" placeholder=" " required>
+      <label for="templateName">Name *</label>
+    </div>
+
+    <!-- Category -->
+    <div class="form-group">
+      <select id="category" name="category">
+        <option value="" selected disabled hidden></option>
+        <option value="Promotional">Promotional</option>
+        <option value="Transactional">Transactional</option>
+        <option value="Newsletter">Newsletter</option>
+      </select>
+      <label for="category">Category</label>
+    </div>
+
+    <!-- CKEditor Textarea (unchanged) -->
+    <div class="form-group">
+      <label for="editor" style="position: static; font-weight: bold; margin-bottom: 6px;">Content *</label>
+      <textarea name="content" id="editor"></textarea>
+    </div>
+
+    <!-- Buttons -->
+    <div class="btn-group">
+      <button type="submit" class="btn btn-save btn1">Save</button>
+      <button type="button" class="btn btn-cancel btn1" onclick="window.history.back()">Cancel</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  CKEDITOR.replace('editor');
+</script>
+{% endblock %} {% endcomment %}
+
+
+{% comment %} {% block top_campaigns %}
+<form method="post">
+  {% csrf_token %}
+  <div class="form-floating mb-4">
+    <input type="text" name="template_name" class="form-control" placeholder=" " required>
+    <label>Template Name</label>
+  </div>
+
+  <div class="mb-4">
+    <label>Category</label>
+    <select name="category" class="form-select">
+      <option value="" selected disabled>Select Category</option>
+        <option value="Promotional">Promotional</option>
+        <option value="Transactional">Transactional</option>
+        <option value="Newsletter">Newsletter</option>
+    </select>
+  </div>
+
+  <div class="mb-4">
+    <textarea name="content" id="templateContent"></textarea>
+  </div>
+
+  <button type="submit" class="btn btn-success">Add Template</button>
+</form>
+
+<script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
+<script>
+  CKEDITOR.replace('templateContent');
+</script>
+
+{% endblock %} {% endcomment %}
+
+
+
+{% block top_campaigns %}
+
+  {% if messages %}
+  <div style="margin-bottom: 20px;">
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
+           role="alert" 
+           style="border-radius: 8px; font-weight: 500;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+  <div class="form-floating mb-4">
+    <input type="text" name="template_name" class="form-control" placeholder=" " required>
+    <label style="font-weight:bolder; color:gray;">Template Name</label>
+  </div>
+
+  <div class="mb-4">
+    <label class="form-label" style="font-weight:bolder; color:gray;">Category</label>
+    <select name="category" class="form-select" required>
+      <option value="" selected disabled>Select Category</option>
+      <option value="Promotional">Promotional</option>
+      <option value="Transactional">Transactional</option>
+      <option value="Newsletter">Newsletter</option>
+    </select>
+  </div>
+
+  <div class="mb-4">
+    <label class="form-label fw-bold mb-2" style="font-weight:bolder; color:gray;" >Content *</label>
+    <textarea name="content" id="templateContent"></textarea>
+  </div>
+
+  {% comment %} <button type="submit" class="btn btn-success">Add Template</button> {% endcomment %}
+
+  <button type="submit" 
+        class="btn" 
+        style="background-color: #37AFE1; color: white; min-width: 120px; height: 40px; padding: 8px 20px; font-size: 16px; border: none;">
+  Save Template
+</button>
+</form>
+
+<!-- Use Full CKEditor Build -->
+<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
+<script>
+  CKEDITOR.replace('templateContent', {
+    height: 200,
+    removePlugins: 'elementspath',
+    resize_enabled: true,
+    toolbarCanCollapse: true
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,1102 @@
+{% extends "userhome.html" %}
+
+{% load static %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}
+{% endblock %}
+
+{% block top_campaigns %} {% endblock %}
+
+
+{% comment %} {% block main %}
+
+<style>
+  :root {
+    --primary: #22c55e;
+    --primary-dark: #16a34a;
+    --bg-light: #f0fdf4;
+    --border: #b8bdbb;
+    --text: #1e293b;
+  }
+
+  .form-wrapper {
+    width: 100%;
+    padding: 30px 4%;
+
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  }
+
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color:  #0bab64;
+  }
+  #heading1{
+    font-weight:bold;
+  }
+
+  .form-floating label {
+    padding: 0 0.5rem;
+    font-size: 1rem;
+    color: #6b7280;
+    transition: all 0.2s ease;
+    top: 6px;
+  }
+
+  .form-floating .form-control:focus + label,
+  .form-floating .form-control:not(:placeholder-shown) + label,
+  .form-floating .form-select:focus + label,
+  .form-floating .form-select:valid + label {
+    transform: translateY(-1.2rem) scale(0.85);
+    color: var(--primary-dark);
+  }
+
+  .form-control,
+  .form-select {
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    padding: 0.2rem 0.6rem;
+    font-size: 0.82rem;
+    line-height: 1.1;
+    height: 36px;
+  }
+
+  .form-control:focus,
+  .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+  }
+
+  textarea.form-control {
+    height: auto !important;
+    min-height: 70px;
+  }
+
+  .dropzone {
+    border: 2px dashed var(--border);
+    background: var(--bg-light);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.5rem 1.5rem;
+  }
+
+  .btn-warning {
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 0.5rem 1.5rem;
+  }
+
+  .file-name-preview {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    color: #374151;
+    text-align: left;
+  }
+
+  .file-name-preview div {
+    margin-bottom: 4px;
+  }
+</style>
+<span>{{ msg1 }}</span>
+<div class="form-wrapper">
+  <h1 align="center" id="heading1">Create New Email Campaign</h1> <br>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-6 form-floating">
+        <input type="text" name="name" class="form-control" placeholder=" " required>
+        <label>Campaign Name</label>
+      </div>
+      <div class="col-md-6 form-floating">
+        <input type="email" name="reply_to" class="form-control" placeholder=" " required>
+        <label>Reply-To Email</label>
+      </div>
+    </div>
+
+    <div class="form-floating mb-3">
+      <textarea name="customRecipients" class="form-control" placeholder=" "></textarea>
+      <label>Recipients (Multiple)</label>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-6 form-floating">
+        <select name="email_list" class="form-select" required>
+          <option value="" selected disabled hidden></option>
+          {% for email in email_lists %}
+          <option value="{{ email.id }}">{{ email.list_name }}</option>
+          {% endfor %}
+        </select>
+        <label>Or Select List</label>
+      </div>
+      <div class="col-md-6 form-floating">
+        <input type="text" name="subject" class="form-control" placeholder=" ">
+        <label>Email Subject</label>
+      </div>
+    </div>
+
+    <div class="form-floating mb-3">
+      <textarea name="customTemplate" class="form-control" placeholder=" " style="min-height: 100px;"></textarea>
+      <label>Email Content (Custom HTML or Text)</label>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-6 form-floating">
+        <select name="template" class="form-select">
+          <option value="" selected disabled hidden></option>
+          {% for temp in templates %}
+          <option value="{{ temp.id }}">{{ temp.template_name }}</option>
+          {% endfor %}
+        </select>
+        <label>Or Select Predefined Template</label>
+      </div>
+      <div class="col-md-6 form-floating">
+        <input type="text" name="placeholder_text" class="form-control" placeholder=" ">
+        <label>Preheader Text</label>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-6 form-floating">
+        <select name="smtp_server" class="form-select" required>
+          <option value="" selected disabled hidden></option>
+          {% for smtp in smtps %}
+          <option value="{{ smtp.id }}">{{ smtp.name }}</option>
+          {% endfor %}
+        </select>
+        <label>SMTP Server</label>
+      </div>
+      <div class="col-md-6 form-floating">
+        <input type="text" name="sender_name" class="form-control" placeholder=" ">
+        <label>Sender Name</label>
+      </div>
+    </div>
+
+    <div class="form-floating mb-3">
+      <input type="text" name="cta_text" class="form-control" placeholder=" ">
+      <label>CTA Button Text (optional)</label>
+    </div>
+
+    <!-- Attachments -->
+    <div class="mb-3">
+      <label class="form-label">Attachments</label>
+      <div class="dropzone" onclick="document.getElementById('fileInput').click()">
+        Drag & drop or click to browse files
+        <input type="file" id="fileInput" name="attachments" multiple accept=".jpg,.jpeg,.png,.xls,.xlsx,.csv,.pdf" style="display: none;">
+        <div id="filePreview" class="file-name-preview"></div>
+      </div>
+    </div>
+
+    <!-- Schedule -->
+    <div class="mb-3" id="scheduleTimeContainer" style="display: none;">
+      <label for="scheduleTime" class="form-label">Schedule Time</label>
+      <input type="datetime-local" id="scheduleTime" name="scheduled_time" class="form-control">
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="submit" name="action" value="send_now" class="btn btn-primary">Send Now</button>
+      <button type="submit" name="action" value="schedule" class="btn btn-warning" id="schedule-btn">Schedule</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.getElementById('schedule-btn').addEventListener('click', function (e) {
+    const container = document.getElementById('scheduleTimeContainer');
+    if (container.style.display === 'none') {
+      e.preventDefault();
+      container.style.display = 'block';
+      this.innerText = "Confirm Schedule";
+      this.type = "submit";
+    }
+  });
+
+  document.getElementById('fileInput').addEventListener('change', function () {
+    const preview = document.getElementById('filePreview');
+    preview.innerHTML = "";
+    Array.from(this.files).forEach(file => {
+      preview.innerHTML += `<div>📎 ${file.name}</div>`;
+    });
+  });
+</script>
+
+{% endblock %} {% endcomment %}
+
+
+
+
+
+
+
+{% comment %} 
+{% block main %}
+<style>
+  .hidden-step {
+    display: none;
+  }
+</style>
+
+<div class="card shadow-sm">
+  <div class="card-header bg-success text-white">
+    <h5 class="mb-0">Create New Email Campaign</h5>
+  </div>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Step 1 -->
+    <div class="card-body" id="step1">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Campaign Name</label>
+          <input type="text" name="name" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Subject Line</label>
+          <input type="text" name="subject" class="form-control">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Sender Name</label>
+          <input type="text" name="sender_name" class="form-control">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Reply-To Email</label>
+          <input type="email" name="reply_to" class="form-control" required>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Preheader Text</label>
+          <input type="text" name="placeholder_text" class="form-control">
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="card-body hidden-step" id="step2">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Custom Recipients</label>
+          <textarea name="customRecipients" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Select Email List</label>
+          <select name="email_list" class="form-select">
+            <option value="" selected disabled>-- Choose List --</option>
+            {% for email in email_lists %}
+              <option value="{{ email.id }}">{{ email.list_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Select Template</label>
+          <select name="template" class="form-select" required>
+            <option value="" selected disabled>-- Choose Template --</option>
+            {% for temp in templates %}
+              <option value="{{ temp.id }}">{{ temp.template_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">SMTP Server</label>
+          <select name="smtp_server" class="form-select" required>
+            <option value="" selected disabled>-- Choose SMTP --</option>
+            {% for smtp in smtps %}
+              <option value="{{ smtp.id }}">{{ smtp.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">CTA Button Text (optional)</label>
+          <input type="text" name="cta_text" class="form-control">
+        </div>
+
+        <!-- Attachments -->
+        <div class="col-12">
+          <label class="form-label">Attachments</label>
+          <div class="border rounded p-3" onclick="document.getElementById('fileInput').click()" style="cursor: pointer;">
+            Click or drag files here
+            <input type="file" id="fileInput" name="attachments" multiple style="display:none;" accept=".jpg,.jpeg,.png,.xls,.xlsx,.csv,.pdf">
+            <div id="filePreview" class="file-name-preview mt-2 text-muted small"></div>
+          </div>
+        </div>
+
+        <!-- Schedule (Optional UI Hook) -->
+        <div class="col-12" id="scheduleTimeContainer" style="display: none;">
+          <label class="form-label">Schedule Time</label>
+          <input type="datetime-local" name="scheduled_time" class="form-control">
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer d-flex justify-content-between">
+      <a href="/userhome/" class="btn btn-secondary">← Cancel</a>
+      <div>
+        <button type="button" class="btn btn-outline-success" id="prevBtn" style="display: none;">← Back</button>
+        <button type="button" class="btn btn-success" id="nextBtn">Next →</button>
+        <button type="submit" class="btn btn-primary" id="sendBtn" name="action" value="send_now" style="display:none;">Send Now</button>
+        <button type="submit" class="btn btn-warning" id="scheduleBtn" name="action" value="schedule" style="display:none;">Schedule</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  const step1 = document.getElementById('step1');
+  const step2 = document.getElementById('step2');
+  const nextBtn = document.getElementById('nextBtn');
+  const prevBtn = document.getElementById('prevBtn');
+  const sendBtn = document.getElementById('sendBtn');
+  const scheduleBtn = document.getElementById('scheduleBtn');
+  const scheduleTimeContainer = document.getElementById('scheduleTimeContainer');
+  const fileInput = document.getElementById('fileInput');
+  const filePreview = document.getElementById('filePreview');
+
+  nextBtn.addEventListener('click', () => {
+    step1.classList.add('hidden-step');
+    step2.classList.remove('hidden-step');
+    nextBtn.style.display = 'none';
+    prevBtn.style.display = 'inline-block';
+    sendBtn.style.display = 'inline-block';
+    scheduleBtn.style.display = 'inline-block';
+  });
+
+  prevBtn.addEventListener('click', () => {
+    step1.classList.remove('hidden-step');
+    step2.classList.add('hidden-step');
+    nextBtn.style.display = 'inline-block';
+    prevBtn.style.display = 'none';
+    sendBtn.style.display = 'none';
+    scheduleBtn.style.display = 'none';
+  });
+
+  scheduleBtn.addEventListener('click', function (e) {
+    if (scheduleTimeContainer.style.display === 'none') {
+      e.preventDefault();
+      scheduleTimeContainer.style.display = 'block';
+      this.textContent = "Confirm Schedule";
+    }
+  });
+
+  // Enhanced file preview with accumulation
+  let allFiles = [];
+  fileInput.addEventListener('change', function () {
+    allFiles = allFiles.concat(Array.from(this.files));
+    filePreview.innerHTML = "";
+    const names = new Set(); // prevent duplicate names
+    allFiles.forEach(file => {
+      if (!names.has(file.name)) {
+        names.add(file.name);
+        filePreview.innerHTML += `<div>📎 ${file.name}</div>`;
+      }
+    });
+    // Reset input so next selection triggers change
+    this.value = null;
+  });
+</script>
+{% endblock %} {% endcomment %}
+
+
+
+
+{% comment %} {% block main %}
+<style>
+  .hidden-step { display: none; }
+  .file-name-preview div { font-size: 0.9rem; margin-bottom: 4px; color: #374151; }
+</style>
+
+<div class="card shadow-sm">
+  <div class="card-header bg-success text-white">
+    <h5 class="mb-0">Create New Email Campaign</h5>
+  </div>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- STEP 1: Campaign Info -->
+    <div class="card-body step" id="step1">
+      <h6 class="mb-3">Step 1: Campaign Setup</h6>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Campaign Name</label>
+          <input type="text" name="name" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Subject Line</label>
+          <input type="text" name="subject" class="form-control">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Sender Name</label>
+          <input type="text" name="sender_name" class="form-control">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Reply-To Email</label>
+          <input type="email" name="reply_to" class="form-control" required>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Preheader Text</label>
+          <input type="text" name="placeholder_text" class="form-control">
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Audience Selection -->
+    <div class="card-body step hidden-step" id="step2">
+      <h6 class="mb-3">Step 2: Audience Targeting</h6>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Custom Recipients</label>
+          <textarea name="customRecipients" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Select Email List</label>
+          <select name="email_list" class="form-select">
+            <option value="" selected disabled>-- Choose List --</option>
+            {% for email in email_lists %}
+              <option value="{{ email.id }}">{{ email.list_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Template & Delivery -->
+    <div class="card-body step hidden-step" id="step3">
+      <h6 class="mb-3">Step 3: Template & Delivery</h6>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Select Template</label>
+          <select name="template" class="form-select" required>
+            <option value="" selected disabled>-- Choose Template --</option>
+            {% for temp in templates %}
+              <option value="{{ temp.id }}">{{ temp.template_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">SMTP Server</label>
+          <select name="smtp_server" class="form-select" required>
+            <option value="" selected disabled>-- Choose SMTP --</option>
+            {% for smtp in smtps %}
+              <option value="{{ smtp.id }}">{{ smtp.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">CTA Button Text (optional)</label>
+          <input type="text" name="cta_text" class="form-control">
+        </div>
+
+        <!-- Attachments -->
+        <div class="col-12">
+          <label class="form-label">Attachments</label>
+          <div class="border rounded p-3" onclick="document.getElementById('fileInput').click()" style="cursor:pointer;">
+            Click or drag files here
+            <input type="file" id="fileInput" name="attachments" multiple accept=".jpg,.jpeg,.png,.xls,.xlsx,.csv,.pdf" style="display:none;">
+            <div id="filePreview" class="file-name-preview mt-2"></div>
+          </div>
+        </div>
+
+        <!-- Schedule -->
+        <div class="col-12" id="scheduleTimeContainer" style="display: none;">
+          <label class="form-label">Schedule Time</label>
+          <input type="datetime-local" name="scheduled_time" class="form-control">
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <div class="card-footer d-flex justify-content-between">
+      <a href="/userhome/" class="btn btn-secondary">← Cancel</a>
+      <div>
+        <button type="button" class="btn btn-outline-success" id="prevBtn" style="display:none;">← Back</button>
+        <button type="button" class="btn btn-success" id="nextBtn">Next →</button>
+        <button type="submit" class="btn btn-primary" id="sendBtn" name="action" value="send_now" style="display:none;">Send Now</button>
+        <button type="submit" class="btn btn-warning" id="scheduleBtn" name="action" value="schedule" style="display:none;">Schedule</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  const steps = [...document.querySelectorAll('.step')];
+  const nextBtn = document.getElementById('nextBtn');
+  const prevBtn = document.getElementById('prevBtn');
+  const sendBtn = document.getElementById('sendBtn');
+  const scheduleBtn = document.getElementById('scheduleBtn');
+  const fileInput = document.getElementById('fileInput');
+  const filePreview = document.getElementById('filePreview');
+  const scheduleContainer = document.getElementById('scheduleTimeContainer');
+
+  let currentStep = 0;
+  let allFiles = [];
+
+  function updateStepView() {
+    steps.forEach((step, index) => {
+      step.classList.toggle('hidden-step', index !== currentStep);
+    });
+    prevBtn.style.display = currentStep > 0 ? 'inline-block' : 'none';
+    nextBtn.style.display = currentStep < steps.length - 1 ? 'inline-block' : 'none';
+    sendBtn.style.display = currentStep === 2 ? 'inline-block' : 'none';
+    scheduleBtn.style.display = currentStep === 2 ? 'inline-block' : 'none';
+  }
+
+  nextBtn.addEventListener('click', () => {
+    if (currentStep < steps.length - 1) currentStep++;
+    updateStepView();
+  });
+
+  prevBtn.addEventListener('click', () => {
+    if (currentStep > 0) currentStep--;
+    updateStepView();
+  });
+
+  scheduleBtn.addEventListener('click', function (e) {
+    if (scheduleContainer.style.display === 'none') {
+      e.preventDefault();
+      scheduleContainer.style.display = 'block';
+      this.textContent = "Confirm Schedule";
+    }
+  });
+
+  fileInput.addEventListener('change', function () {
+    allFiles = allFiles.concat(Array.from(this.files));
+    const names = new Set();
+    filePreview.innerHTML = "";
+    allFiles.forEach(file => {
+      if (!names.has(file.name)) {
+        names.add(file.name);
+        filePreview.innerHTML += `<div>📎 ${file.name}</div>`;
+      }
+    });
+    this.value = null;
+  });
+
+  updateStepView();
+</script>
+{% endblock %} {% endcomment %}
+
+
+
+
+
+{% comment %} {% block main %}
+<style>
+  .hidden-step { display: none; }
+  .file-name-preview div { font-size: 0.9rem; margin-bottom: 4px; color: #4B5563; }
+  .form-label {
+    color: #55545cff;
+    font-weight: 500;
+  }
+  .form-control, .form-select {
+    border: 1px solid  #dddfe9d5;
+    box-shadow: none;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color: #7b7dc9ff;
+    box-shadow: 0 0 0 0.2rem #dddfe9d5;;
+  }
+  .card-header {
+    background-color: #3b82f6; !important;
+  }
+  .card-header h5 {
+    color: white;
+  }
+  .btn-outline-success {
+    border-color: #7C3AED;
+    color: #7C3AED;
+  }
+  .btn-outline-success:hover {
+    background-color: #7C3AED;
+    color: white;
+  }
+  .btn-success {
+    background-color: #6366F1;
+    border-color: #6366F1;
+  }
+  .btn-success:hover {
+    background-color: #4F46E5;
+  }
+  .btn-warning {
+    background-color: #10B981;
+    border-color: #10B981;
+    color: white;
+  }
+  .btn-warning:hover {
+    background-color: #059669;
+  }
+</style>
+
+<div class="card shadow-sm">
+  <div class="card-header">
+    <h5 class="mb-0">Create New Email Campaign</h5>
+  </div>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- STEP 1: Campaign Info -->
+    <div class="card-body step" id="step1">
+      <label class="mb-3" style="font-weight:bold; font-size:22px; color:gray">Step 1: Campaign Setup</label>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Campaign Name</label>
+          <input type="text" name="name" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Subject Line</label>
+          <input type="text" name="subject" class="form-control">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Sender Name</label>
+          <input type="text" name="sender_name" class="form-control">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Reply-To Email</label>
+          <input type="email" name="reply_to" class="form-control" required>
+        </div>
+        <div class="col-12">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Preheader Text</label>
+          <input type="text" name="placeholder_text" class="form-control">
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Audience Selection -->
+    <div class="card-body step hidden-step" id="step2">
+      <label class="mb-3" style="font-weight:bold; font-size:22px; color:gray">Step 2: Audience Targeting</label>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Custom Recipients</label>
+          <textarea name="customRecipients" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Select Email List</label>
+          <select name="email_list" class="form-select">
+            <option value="" selected disabled>-- Choose List --</option>
+            {% for email in email_lists %}
+              <option value="{{ email.id }}">{{ email.list_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Template & Delivery -->
+    <div class="card-body step hidden-step" id="step3">
+      <label class="mb-3" style="font-weight:bold; font-size:22px; color:gray">Step 3: Template & Delivery</label>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Select Template</label>
+          <select name="template" class="form-select" required>
+            <option value="" selected disabled>-- Choose Template --</option>
+            {% for temp in templates %}
+              <option value="{{ temp.id }}">{{ temp.template_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">SMTP Server</label>
+          <select name="smtp_server" class="form-select" required>
+            <option value="" selected disabled>-- Choose SMTP --</option>
+            {% for smtp in smtps %}
+              <option value="{{ smtp.id }}">{{ smtp.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">CTA Button Text (optional)</label>
+          <input type="text" name="cta_text" class="form-control">
+        </div>
+
+        <!-- Attachments -->
+        <div class="col-12">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Attachments</label>
+          <div class="border rounded p-3" onclick="document.getElementById('fileInput').click()" style="cursor:pointer;">
+            Click or drag files here
+            <input type="file" id="fileInput" name="attachments" accept=".jpg,.jpeg,.png,.xls,.xlsx,.csv,.pdf" style="display:none;" multiple>
+            <div id="filePreview" class="file-name-preview mt-2"></div>
+          </div>
+        </div>
+
+        <!-- Schedule -->
+        <div class="col-12" id="scheduleTimeContainer" style="display: none;">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Schedule Time</label>
+          <input type="datetime-local" name="scheduled_time" class="form-control">
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <div class="card-footer d-flex justify-content-between">
+        <a href="/userhome/" 
+   class="btn" 
+   style="
+     background-color: #7b7e80ff !important; 
+     color: white !important; 
+     min-width: 120px; 
+     height: 40px; 
+     line-height: 24px; 
+     padding: 8px 20px; 
+     font-size: 16px; 
+     border: none;
+     display: inline-flex; 
+     align-items: center; 
+     justify-content: center;
+     text-decoration: none;
+     margin-top: 13px;
+   ">
+   ← Cancel
+</a>
+
+    <div class="d-flex gap-2 flex-wrap mt-3">
+      <button type="button" class="btn" id="prevBtn" style="display:none; background-color: #37AFE1; color: white; min-width: 120px;">← Back</button>
+      <button type="button" class="btn" id="nextBtn" style="background-color: #37AFE1; color: white; min-width: 120px;">Next →</button>
+      <button type="submit" class="btn" id="sendBtn" name="action" value="send_now" style="display:none; background-color: #37AFE1; color: white; min-width: 120px;">Send Now</button>
+      <button type="submit" class="btn" id="scheduleBtn" name="action" value="schedule" style="display:none; background-color: #37AFE1; color: white; min-width: 120px;">Schedule</button>
+    </div>
+
+    </div>
+  </form>
+</div>
+
+<script>
+  const steps = [...document.querySelectorAll('.step')];
+  const nextBtn = document.getElementById('nextBtn');
+  const prevBtn = document.getElementById('prevBtn');
+  const sendBtn = document.getElementById('sendBtn');
+  const scheduleBtn = document.getElementById('scheduleBtn');
+  const fileInput = document.getElementById('fileInput');
+  const filePreview = document.getElementById('filePreview');
+  const scheduleContainer = document.getElementById('scheduleTimeContainer');
+
+  let currentStep = 0;
+  let allFiles = [];
+
+  function updateStepView() {
+    steps.forEach((step, index) => {
+      step.classList.toggle('hidden-step', index !== currentStep);
+    });
+    prevBtn.style.display = currentStep > 0 ? 'inline-block' : 'none';
+    nextBtn.style.display = currentStep < steps.length - 1 ? 'inline-block' : 'none';
+    sendBtn.style.display = currentStep === 2 ? 'inline-block' : 'none';
+    scheduleBtn.style.display = currentStep === 2 ? 'inline-block' : 'none';
+  }
+
+  nextBtn.addEventListener('click', () => {
+    if (currentStep < steps.length - 1) currentStep++;
+    updateStepView();
+  });
+
+  prevBtn.addEventListener('click', () => {
+    if (currentStep > 0) currentStep--;
+    updateStepView();
+  });
+
+  scheduleBtn.addEventListener('click', function (e) {
+    if (scheduleContainer.style.display === 'none') {
+      e.preventDefault();
+      scheduleContainer.style.display = 'block';
+      this.textContent = "Confirm Schedule";
+    }
+  });
+
+  fileInput.addEventListener('change', function () {
+  /*  allFiles = allFiles.concat(Array.from(this.files));*/
+    allFiles = Array.from(this.files);
+    const names = new Set();
+    filePreview.innerHTML = "";
+    allFiles.forEach(file => {
+      if (!names.has(file.name)) {
+        names.add(file.name);
+        filePreview.innerHTML += `<div>📎 ${file.name}</div>`;
+      }
+    });
+   /* this.value = null; */
+  });
+
+  updateStepView();
+</script>
+{% endblock %} {% endcomment %}
+
+
+
+
+
+
+{% block main %}
+<style>
+  .hidden-step { display: none; }
+  .file-name-preview div { font-size: 0.9rem; margin-bottom: 4px; color: #4B5563; }
+  .form-label {
+    color: #55545cff;
+    font-weight: 500;
+  }
+  .form-control, .form-select {
+    border: 1px solid  #dddfe9d5;
+    box-shadow: none;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color: #7b7dc9ff;
+    box-shadow: 0 0 0 0.2rem #dddfe9d5;;
+  }
+  .card-header {
+    background-color: #3b82f6 !important;
+  }
+  .card-header h5 {
+    color: white;
+  }
+  .btn-outline-success {
+    border-color: #7C3AED;
+    color: #7C3AED;
+  }
+  .btn-outline-success:hover {
+    background-color: #7C3AED;
+    color: white;
+  }
+  .btn-success {
+    background-color: #6366F1;
+    border-color: #6366F1;
+  }
+  .btn-success:hover {
+    background-color: #4F46E5;
+  }
+  .btn-warning {
+    background-color: #10B981;
+    border-color: #10B981;
+    color: white;
+  }
+  .btn-warning:hover {
+    background-color: #059669;
+  }
+</style>
+
+
+    {% if messages %}
+  <div style="margin-bottom: 20px;">
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
+           role="alert" 
+           style="border-radius: 8px; font-weight: 500;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<div class="card shadow-sm">
+  <div class="card-header">
+    <h5 class="mb-0">Create New Email Campaign</h5>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" id="campaignForm">
+    {% csrf_token %}
+
+    <!-- STEP 1: Campaign Info -->
+    <div class="card-body step" id="step1">
+      <label class="mb-3" style="font-weight:bold; font-size:22px; color:gray">Step 1: Campaign Setup</label>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Campaign Name</label>
+          <input type="text" name="name" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Subject Line</label>
+          <input type="text" name="subject" class="form-control">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Sender Name</label>
+          <input type="text" name="sender_name" class="form-control">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Reply-To Email</label>
+          <input type="email" name="reply_to" class="form-control" required>
+        </div>
+        <div class="col-12">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Preheader Text</label>
+          <input type="text" name="placeholder_text" class="form-control">
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Audience Selection -->
+    <div class="card-body step hidden-step" id="step2">
+      <label class="mb-3" style="font-weight:bold; font-size:22px; color:gray">Step 2: Audience Targeting</label>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Custom Recipients</label>
+          <textarea name="customRecipients" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Select Email List</label>
+          <select name="email_list" class="form-select">
+            <option value="" selected disabled>-- Choose List --</option>
+            {% for email in email_lists %}
+              <option value="{{ email.id }}">{{ email.list_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Template & Delivery -->
+    <div class="card-body step hidden-step" id="step3">
+      <label class="mb-3" style="font-weight:bold; font-size:22px; color:gray">Step 3: Template & Delivery</label>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Select Template</label>
+          <select name="template" class="form-select" required>
+            <option value="" selected disabled>-- Choose Template --</option>
+            {% for temp in templates %}
+              <option value="{{ temp.id }}">{{ temp.template_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">SMTP Server</label>
+          <select name="smtp_server" class="form-select" required>
+            <option value="" selected disabled>-- Choose SMTP --</option>
+            {% for smtp in smtps %}
+              <option value="{{ smtp.id }}">{{ smtp.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">CTA url (optional)</label>
+          <input type="text" name="cta_url" class="form-control">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight:bolder; color:gray;">CTA Button Text (optional)</label>
+          <input type="text" name="cta_text" class="form-control">
+        </div>
+
+
+
+        <!-- Attachments -->
+        <div class="col-12">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Attachments</label>
+          <div class="border rounded p-3" onclick="document.getElementById('fileInput').click()" style="cursor:pointer;">
+            Click or drag files here
+            <input type="file" id="fileInput" name="attachments[]" multiple accept=".jpg,.jpeg,.png,.xls,.xlsx,.csv,.pdf" style="display:none;">
+            <div id="filePreview" class="file-name-preview mt-2"></div>
+          </div>
+        </div>
+
+        <!-- Schedule -->
+        <div class="col-12" id="scheduleTimeContainer" style="display: none;">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Schedule Time</label>
+          <input type="datetime-local" name="scheduled_time" class="form-control">
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <div class="card-footer d-flex justify-content-between">
+      <a href="/userhome/" class="btn" style="background-color: #7b7e80ff !important; color: white !important; min-width: 120px; height: 40px; line-height: 24px; padding: 8px 20px; font-size: 16px; border: none; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; margin-top: 13px;">
+        ← Cancel
+      </a>
+
+      <div class="d-flex gap-2 flex-wrap mt-3">
+        <button type="button" class="btn" id="prevBtn" style="display:none; background-color: #37AFE1; color: white; min-width: 120px;">← Back</button>
+        <button type="button" class="btn" id="nextBtn" style="background-color: #37AFE1; color: white; min-width: 120px;">Next →</button>
+        <button type="submit" class="btn" id="sendBtn" name="action" value="send_now" style="display:none; background-color: #37AFE1; color: white; min-width: 120px;">Send Now</button>
+        <button type="button" class="btn" id="scheduleBtn" style="display:none; background-color: #37AFE1; color: white; min-width: 120px;">Schedule</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  const steps = [...document.querySelectorAll('.step')];
+  const nextBtn = document.getElementById('nextBtn');
+  const prevBtn = document.getElementById('prevBtn');
+  const sendBtn = document.getElementById('sendBtn');
+  const scheduleBtn = document.getElementById('scheduleBtn');
+  const fileInput = document.getElementById('fileInput');
+  const filePreview = document.getElementById('filePreview');
+  const scheduleContainer = document.getElementById('scheduleTimeContainer');
+  const form = document.getElementById('campaignForm');
+
+  let currentStep = 0;
+
+  function updateStepView() {
+    steps.forEach((step, index) => {
+      step.classList.toggle('hidden-step', index !== currentStep);
+    });
+    prevBtn.style.display = currentStep > 0 ? 'inline-block' : 'none';
+    nextBtn.style.display = currentStep < steps.length - 1 ? 'inline-block' : 'none';
+    sendBtn.style.display = currentStep === 2 ? 'inline-block' : 'none';
+    scheduleBtn.style.display = currentStep === 2 ? 'inline-block' : 'none';
+  }
+
+  nextBtn.addEventListener('click', () => {
+    if (currentStep < steps.length - 1) currentStep++;
+    updateStepView();
+  });
+
+  prevBtn.addEventListener('click', () => {
+    if (currentStep > 0) currentStep--;
+    updateStepView();
+  });
+
+  // Fixed file handling
+  fileInput.addEventListener('change', function() {
+    filePreview.innerHTML = "";
+    
+    if (this.files.length > 0) {
+      Array.from(this.files).forEach(file => {
+        filePreview.innerHTML += `<div>📎 ${file.name}</div>`;
+      });
+    }
+  });
+
+  // Schedule button handling
+  let scheduleConfirmed = false;
+  scheduleBtn.addEventListener('click', function(e) {
+    if (!scheduleConfirmed) {
+      e.preventDefault();
+      scheduleContainer.style.display = 'block';
+      this.textContent = "Confirm Schedule";
+      scheduleConfirmed = true;
+    } else {
+      // Change to submit button when confirming schedule
+      const confirmBtn = document.createElement('button');
+      confirmBtn.type = 'submit';
+      confirmBtn.name = 'action';
+      confirmBtn.value = 'schedule';
+      confirmBtn.className = this.className;
+      confirmBtn.style.cssText = this.style.cssText;
+      confirmBtn.textContent = "Schedule";
+      this.parentNode.replaceChild(confirmBtn, this);
+    }
+  });
+
+  updateStepView();
+</script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "adminhome.html" %}
+
+{% block summary_content %}{% endblock %}
+{% block outermain %}{% endblock %}
+{% block main %}{% endblock %}
+
+
+{% block top_campaigns %}
+<div class="card shadow-sm">
+  <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">User Credit Management</h5>
+    <span class="badge bg-light text-dark">Total Users: {{ users|length }}</span>
+  </div>
+  <div class="card-body">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover">
+        <thead class="table-light">
+  <tr>
+    <th>#</th>
+    <th>User Name</th>
+    <th>Email</th>
+    <th>Email Credit</th>
+    <th>Used Credit</th>
+    <th>Credit Left</th>
+    <th>Actions</th>
+  </tr>
+</thead>
+<tbody>
+  {% for user in users %}
+  <tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ user.name }}</td>
+    <td>{{ user.email }}</td>
+    <td>{{ user.email_credit_limit }}</td>
+    <td>{{ user.used_credit }}</td>
+    <td>{{ user.credit_left }}</td>
+    <td>
+      <a href="{% url 'edit_user_credit' user.id %}" class="btn btn-sm btn-warning">
+        <i class="bi bi-pencil"></i> Edit
+      </a>
+    </td>
+  </tr>
+  {% empty %}
+  <tr><td colspan="7" class="text-center">No users found.</td></tr>
+  {% endfor %}
+</tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

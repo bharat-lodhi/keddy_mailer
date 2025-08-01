@@ -1,0 +1,357 @@
+{% extends "userhome.html" %}
+
+{% load static %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}
+{% endblock %}
+{% block top_campaigns %} {% endblock %}
+
+{% comment %} {% block main %}
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <style>
+
+    :root {
+      --bg: #f1fcf7;
+      --label: #10b981;
+      --focus-shadow: rgba(16, 185, 129, 0.15);
+      --btn-gradient: linear-gradient(90deg, #0bab64, #3bb78f);
+    }
+
+    * { box-sizing: border-box; }
+
+    form {
+      max-width: 1100px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+    }
+    .form-title {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      text-align: center;
+      color: #0bab64
+    }
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 10px;
+    }
+    .form-col {
+      flex: 1;
+      min-width: 280px;
+    }
+    .form-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 10px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: transparent;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--label);
+      box-shadow: 0 0 0 3px var(--focus-shadow);
+    }
+    .form-group label {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      background: white;
+      padding: 0 5px;
+      color: #666;
+      transition: all 0.2s ease;
+      pointer-events: none;
+      font-size: 14px;
+    }
+    .form-group input:focus + label,
+    .form-group input:not(:placeholder-shown) + label,
+    .form-group select:focus + label,
+    .form-group select:valid + label {
+      top: -8px;
+      left: 8px;
+      font-size: 12px;
+      color: var(--label);
+    }
+    .input-group {
+      position: relative;
+    }
+    .input-group button {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 30px;
+    }
+    button {
+      padding: 10px 24px;
+      border: none;
+      font-size: 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #333;
+    }
+    .btn-success {
+      background: var(--btn-gradient);
+      color: white;
+    }
+    .btn-primary {
+      background: linear-gradient(90deg, #16a34a, #10b981);
+      color: white;
+    }
+    .btn-primary:hover,
+    .btn-success:hover {
+      opacity: 0.9;
+    }
+  </style>
+  
+<form method="post">
+{% csrf_token %}
+
+{% if messages %}
+  <div style="margin-bottom: 20px;">
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
+           role="alert" 
+           style="border-radius: 8px; font-weight: 500;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<div class="form-title">Add Email Server</div>
+
+  <div class="form-row">
+    <div class="form-col form-group">
+      <input type="text" name="name" placeholder=" " required>
+      <label>Server Name</label>
+    </div>
+    <div class="form-col form-group">
+      <input type="text" name="from_email" placeholder=" " required>
+      <label>From Email</label>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-col form-group">
+      <input type="text" name="host" placeholder=" " required>
+      <label>SMTP Host</label>
+    </div>
+    <div class="form-col form-group">
+      <input type="number" name="emails_per_hour" placeholder=" " required>
+      <label>Emails Per Hour</label>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-col form-group">
+      <input type="text" name="smtp_server" placeholder=" " required>
+      <label>SMTP Server</label>
+    </div>
+    <div class="form-col form-group">
+      <input type="text" name="username" placeholder=" " required>
+      <label>Username</label>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-col form-group input-group">
+      <input type="password" id="smtpPassword" name="password" placeholder=" " required>
+      <label>Password</label>
+      <button type="button" onclick="toggleVisibility('smtpPassword', this)">
+        <i class="bi bi-eye"></i>
+      </button>
+    </div>
+    <div class="form-col form-group">
+      <select name="port" required>
+        <option value="" disabled selected hidden></option>
+        <option value="25">25</option>
+        <option value="587">587</option>
+        <option value="465">465</option>
+      </select>
+      <label>Port</label>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-col form-group">
+      <select name="security" required>
+        <option value="" disabled selected hidden></option>
+        <option value="TLS">TLS</option>
+        <option value="SSL">SSL</option>
+        <option value="none">None</option>
+      </select>
+      <label>Security</label>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <a href="/userhome/"><button type="button" class="btn-secondary">Cancel</button></a>
+    <div>
+      <button type="submit" class="btn-success">Verify & Save </button>
+    </div>
+  </div>
+</form>
+
+<script>
+  function toggleVisibility(id, btn) {
+    const input = document.getElementById(id);
+    if (input.type === "password") {
+      input.type = "text";
+      btn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+    } else {
+      input.type = "password";
+      btn.innerHTML = '<i class="bi bi-eye"></i>';
+    }
+  }
+</script>
+
+{% endblock %} {% endcomment %}
+
+
+
+
+{% block main %}
+
+<div class="card shadow-sm">
+  <div class="card-header text-white" style="background:#3b82f6">
+    <h5 class="mb-0">Add Email Server</h5>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+
+    {% if messages %}
+      <div class="p-2">
+        {% for message in messages %}
+          <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
+               role="alert" 
+               style="border-radius: 8px; font-weight: 500;">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="card-body row g-3">
+
+      <div class="col-md-6">
+        <label class="form-label lab" style="font-weight:bolder; color:gray;">Server Name</label>
+        <input type="text" name="name" class="form-control" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" style="font-weight:bolder; color:gray;">From Email</label>
+        <input type="text" name="from_email" class="form-control" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" style="font-weight:bolder; color:gray;">SMTP Host</label>
+        <input type="text" name="host" class="form-control" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" style="font-weight:bolder; color:gray;">Emails Per Hour</label>
+        <input type="number" name="emails_per_hour" class="form-control" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" style="font-weight:bolder; color:gray;">SMTP Server</label>
+        <input type="text" name="smtp_server" class="form-control" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" style="font-weight:bolder; color:gray;">Username</label>
+        <input type="text" name="username" class="form-control" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" style="font-weight:bolder; color:gray;">Password</label>
+        <div class="input-group">
+          <input type="password" name="password" id="smtpPassword" class="form-control" required>
+          <button type="button" class="btn btn-outline-secondary" onclick="toggleVisibility('smtpPassword', this)">
+            <i class="bi bi-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" style="font-weight:bolder; color:gray;">Port</label>
+        <select name="port" class="form-select" required>
+          <option value="" disabled selected hidden>Select Port</option>
+          <option value="25">25</option>
+          <option value="587">587</option>
+          <option value="465">465</option>
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" style="font-weight:bolder; color:gray;">Security</label>
+        <select name="security" class="form-select" required>
+          <option value="" disabled selected hidden>Select Security</option>
+          <option value="TLS">TLS</option>
+          <option value="SSL">SSL</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+
+    </div>
+
+    <div class="card-footer d-flex justify-content-between flex-wrap">
+      <a href="/userhome/" class="btn btn-secondary">← Cancel</a>
+      {% comment %} <button type="submit" class="btn btn-success">Verify & Save</button> {% endcomment %}
+      <button type="submit" 
+        class="btn" 
+        style="background-color: #37AFE1; color: white; min-width: 120px; height: 40px; padding: 8px 20px; font-size: 16px; border: none;">
+  Verify & Save
+</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function toggleVisibility(id, btn) {
+    const input = document.getElementById(id);
+    if (input.type === "password") {
+      input.type = "text";
+      btn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+    } else {
+      input.type = "password";
+      btn.innerHTML = '<i class="bi bi-eye"></i>';
+    }
+  }
+</script>
+{% endblock %}

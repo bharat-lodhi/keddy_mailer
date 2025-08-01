@@ -1,0 +1,335 @@
+{% extends "userhome.html" %}
+
+{% load static %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}
+{% endblock %}
+
+{% block outermain %}{% endblock %}
+{% block main %} {% endblock %}
+
+{% block topbar1 %}
+{% endblock %}
+
+{% comment %} {% block top_campaigns %}
+{% load static %}
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+
+        .chat-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+        }
+
+        .chat-header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 15px 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .chat-body {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-message {
+            max-width: 75%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            font-size: 15px;
+            word-wrap: break-word;
+        }
+
+        .sent {
+            align-self: flex-end;
+            background-color: #007bff;
+            color: white;
+            border-bottom-right-radius: 0;
+        }
+
+        .received {
+            align-self: flex-start;
+            background-color: #e4e6eb;
+            color: #333;
+            border-bottom-left-radius: 0;
+        }
+
+        .chat-footer {
+            padding: 10px 20px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-footer input {
+            flex-grow: 1;
+        }
+
+        .timestamp {
+            font-size: 11px;
+            display: block;
+            margin-top: 5px;
+            opacity: 0.6;
+        }
+    </style>
+
+
+<div class="chat-container">
+    <div class="chat-header">Chat with Admin</div>
+    <div class="chat-body" id="chatMessages">
+        <!-- Messages will be dynamically loaded here -->
+    </div>
+
+    <div class="chat-footer">
+        <input type="text" class="form-control" id="chatInput" placeholder="Type a message...">
+        <button class="btn btn-primary" id="sendBtn">Send</button>
+    </div>
+</div>
+
+<script>
+    const receiverEmail = "admin@example.com"; // change if dynamic
+
+    function fetchMessages() {
+        fetch("/fetch_messages/")
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    const chatBox = document.getElementById("chatMessages");
+                    chatBox.innerHTML = "";
+
+                    data.messages.forEach(msg => {
+                        const msgDiv = document.createElement("div");
+                        msgDiv.classList.add("chat-message");
+                        msgDiv.classList.add(msg.sender === "{{ request.session.email }}" ? "sent" : "received");
+
+                        msgDiv.innerHTML = `
+                            ${msg.message}
+                            <span class="timestamp">${msg.time}</span>
+                        `;
+                        chatBox.appendChild(msgDiv);
+                    });
+
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+            });
+    }
+
+    document.getElementById("sendBtn").addEventListener("click", () => {
+        const msgInput = document.getElementById("chatInput");
+        const message = msgInput.value.trim();
+        if (!message) return;
+
+        fetch("/send_message/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({
+                receiver_email: receiverEmail,
+                message: message
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                msgInput.value = "";
+                fetchMessages();
+            }
+        });
+    });
+
+    // Auto-refresh messages every 5 seconds
+    setInterval(fetchMessages, 5000);
+    window.onload = fetchMessages;
+</script>
+
+
+{% endblock %} {% endcomment %}
+
+
+
+
+{% block top_campaigns %}
+
+
+<style>
+    .userchat-container {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        height: 92vh;
+        max-height: 92vh;
+        max-width: 1020px;
+    }
+
+    .userchat-header {
+        background-color: #3b82f6;
+        color: #fff;
+        padding: 8px 20px;
+        font-size: 1.25rem;
+        font-weight: bold;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
+    .userchat-body {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .userchat-message {
+        max-width: 75%;
+        padding: 10px 15px;
+        border-radius: 20px;
+        margin-bottom: 10px;
+        font-size: 0.95rem;
+        word-wrap: break-word;
+    }
+
+    .userchat-sent {
+        align-self: flex-end;
+        background-color: #d1e7ff;
+        color: #333;
+        border-bottom-right-radius: 0;
+    }
+
+    .userchat-received {
+        align-self: flex-start;
+        background-color: #e4e6eb;
+        color: #333;
+        border-bottom-left-radius: 0;
+    }
+
+    .userchat-footer {
+        padding: 10px 20px;
+        background: #f8f9fa;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .userchat-footer input {
+        flex-grow: 1;
+    }
+
+    .userchat-timestamp {
+        font-size: 11px;
+        display: block;
+        margin-top: 5px;
+        opacity: 0.6;
+    }
+
+    @media (max-width: 576px) {
+        .userchat-container {
+            height: 90vh;
+            border-radius: 0;
+        }
+
+        .userchat-footer {
+            padding: 10px;
+        }
+
+        .userchat-message {
+            max-width: 90%;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<div >
+    <div class="userchat-container shadow-sm">
+        <div class="userchat-header">Chat with Admin</div>
+        <div class="userchat-body" id="userchat-messages"></div>
+
+        <div class="userchat-footer">
+            <input type="text" class="form-control" id="userchat-input" style="max-width:90%" placeholder="Type a message...">
+            <button class="btn btn-primary" id="userchat-send-btn">Send</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const receiverEmail = "admin@example.com";
+
+    function fetchMessages() {
+        fetch("/fetch_messages/")
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    const chatBox = document.getElementById("userchat-messages");
+                    chatBox.innerHTML = "";
+
+                    data.messages.forEach(msg => {
+                        const msgDiv = document.createElement("div");
+                        msgDiv.classList.add("userchat-message");
+                        msgDiv.classList.add(msg.sender === "{{ request.session.email }}" ? "userchat-sent" : "userchat-received");
+
+                        msgDiv.innerHTML = `
+                            ${msg.message}
+                            <span class="userchat-timestamp">${msg.time}</span>
+                        `;
+                        chatBox.appendChild(msgDiv);
+                    });
+
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+            });
+    }
+
+    document.getElementById("userchat-send-btn").addEventListener("click", () => {
+        const msgInput = document.getElementById("userchat-input");
+        const message = msgInput.value.trim();
+        if (!message) return;
+
+        fetch("/send_message/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({
+                receiver_email: receiverEmail,
+                message: message
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                msgInput.value = "";
+                fetchMessages();
+            }
+        });
+    });
+
+    setInterval(fetchMessages, 5000);
+    window.onload = fetchMessages;
+</script>
+{% endblock %}

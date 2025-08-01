@@ -1,0 +1,72 @@
+{% extends "adminhome.html" %}
+
+{% block summary_content %}{% endblock %}
+
+{% block outermain %}{% endblock %}
+
+{% block main %}{% endblock %}
+
+{% block top_campaigns %}
+<div class="card shadow-sm">
+  <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">All Campaigns</h5>
+    <span class="badge bg-light text-dark">Total: {{ campaigns|length }}</span>
+  </div>
+  <div class="card-body">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Campaign Name</th>
+            <th>User</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in campaigns %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ c.name }}</td>
+
+              <td>{{ c.user_name }}</td>
+
+              <td>
+                {% if c.is_sent %}
+                  <span class="badge bg-success">Sent</span>
+                {% elif c.scheduled_time %}
+                  {% if c.scheduled_time > now %}
+                    <span class="badge bg-warning text-dark">Scheduled</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Pending</span>
+                  {% endif %}
+                {% else %}
+                  <span class="badge bg-secondary">Pending</span>
+                {% endif %}
+              </td>
+              <td>{{ c.created_at|date:"M d, Y H:i" }}</td>
+              <td>
+                <a href="{% url 'delete_campaign_admin' c.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this campaign?')">
+                  <i class="bi bi-trash"></i> Delete
+                </a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="text-center">No campaigns found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+first run redis-server.exe  file 
+
+ngrok http 8000    exe file
+
+cmd1 = python manage.py runserver
+
+cmd2 = celery -A keddy_mailer worker --pool=solo --loglevel=info
+
+cmd3 = celery -A keddy_mailer beat --loglevel=info
+
+

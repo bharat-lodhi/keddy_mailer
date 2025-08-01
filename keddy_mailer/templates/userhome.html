@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Keddy Mailer - User Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8fafc;
+      color: #1a1a1a;
+    }
+
+    .dashboard-container {
+      display: flex;
+      flex-direction: row;
+      min-height: 100vh;
+    }
+
+
+
+.sidebar {
+  width: 280px;
+  background-color: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.user-profile {
+  padding: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.nav-scroll {
+  overflow-y: auto;
+  flex-grow: 1;
+  padding-bottom: 40px;
+}
+
+
+    .sidebar {
+      width: 280px;
+      background-color: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      padding: 24px 0;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 1000;
+    }
+
+    .sidebar-header {
+      padding: 0 24px 24px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .brand {
+      font-size: 24px;
+      font-weight: 700;
+      color: #3b82f6;
+    }
+
+    .user-profile {
+      padding: 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    
+    #uname{
+      font-weight:bold;
+      color:rgb(25 135 84);
+      font-size:1rem;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-bottom: 12px;
+    }
+
+    .user-name {
+      font-weight: 600;
+    }
+
+    .user-role {
+      color: #6b7280;
+      font-size: 12px;
+    }
+
+    .nav-menu {
+      list-style: none;
+      padding: 20px 0 0;
+    }
+
+    .nav-item {
+      margin-bottom: 4px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 12px 24px;
+      text-decoration: none;
+      color: #6b7280;
+      font-weight: 500;
+      transition: 0.2s;
+      font-size:14px;
+    }
+
+    .nav-link:hover {
+      background-color: #f1f5f9;
+      color: #3b82f6;
+    }
+
+    .nav-item.active .nav-link {
+      background-color: #eff6ff;
+      color: #0d6efd  !important;
+      border-right: 3px solid #3b82f6;
+    }
+
+
+    .nav-link i {
+      margin-right: 12px;
+    }
+
+    .main-content {
+      margin-left: 280px;
+      padding: 24px 32px;
+      width: 100%;
+      flex: 1;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .top-bar .container {
+      flex: 1 1 300px;
+    }
+
+    .top-bar-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn-primary {
+      background-color: #3b82f6;
+      border-color: #3b82f6;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-weight: 500;
+    }
+
+    .statistics-section {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 16px;
+      }
+
+      .top-bar {
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .top-bar-actions {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <h3 class="brand">Keddy Mailer</h3>
+    </div>
+
+
+<div class="user-profile d-flex align-items-center px-3">
+  <img src="{{ user.profile_image.url }}" alt="User" class="user-avatar me-3 shadow">
+
+  <div class="user-info">
+    <div class="user-name" id="uname">{{ company_name }}</div>
+    <small class="user-role">User - {{ uname }}</small><br>
+    
+    <div class="mt-2">
+  <small class="text-muted">Credits Left</small>
+  <div class="progress" style="height: 10px;">
+    <div class="progress-bar bg-success" role="progressbar"
+         style="width: {{ credit_percent|default:0 }}%;" aria-valuenow="{{ credits_percent }}"
+         aria-valuemin="0" aria-valuemax="100"></div>
+  </div>
+  <small><strong>{{ credits_left|default:0 }}</strong> / {{ credit_limit|default:0 }}</small>
+</div>
+
+  </div>
+</div>
+
+
+
+
+    {% comment %} <ul class="nav-menu">
+      <li class="nav-item {% if request.path == '/userhome/' %}active{% endif %}">
+        <a href="/userhome/" class="nav-link"><i class="bi bi-grid-3x3-gap-fill"></i>Dashboard</a>
+      </li>
+      <li class="nav-item {% if request.path == '/add_server/' %}active{% endif %}">
+        <a href="/add_server/" class="nav-link"><i class="bi bi-server"></i>Server</a>
+      </li>
+      <li class="nav-item {% if request.path == '/add_list/' %}active{% endif %}">
+        <a href="/add_list/" class="nav-link"><i class="bi bi-list-ul"></i>List</a>
+      </li>
+      <li class="nav-item {% if request.path == '/add_template/' %}active{% endif %}">
+        <a href="/add_template/" class="nav-link"><i class="bi bi-file-earmark-text"></i>Template</a>
+      </li>
+      <li class="nav-item {% if request.path == '/create_campaign/' %}active{% endif %}">
+        <a href="/create_campaign/" class="nav-link"><i class="bi bi-megaphone"></i>Campaign</a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link"><i class="bi bi-people"></i>Subscribers</a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link"><i class="bi bi-gear"></i>Settings</a>
+      </li>
+    </ul> {% endcomment %}
+
+
+
+
+
+{% comment %} <ul class="nav-menu">
+
+  <!-- Dashboard -->
+  <li class="nav-item {% if request.path == '/userhome/' %}active{% endif %}">
+    <a href="/userhome/" class="nav-link"><i class="bi bi-grid-3x3-gap-fill"></i>Dashboard</a>
+  </li>
+
+  <!-- Server Section -->
+  <li class="nav-item {% if '/server' in request.path %}active{% endif %}">
+    <a class="nav-link" data-bs-toggle="collapse" href="#serverMenu" role="button" aria-expanded="false" aria-controls="serverMenu">
+      <i class="bi bi-server"></i> Server
+    </a>
+    <div class="collapse {% if '/server' in request.path %}show{% endif %}" id="serverMenu">
+      <ul class="list-unstyled ps-4">
+        <li><a href="/add_server/" class="nav-link {% if request.path == '/add_server/' %}active{% endif %}">Add Server</a></li>
+        <li><a href="/smtp_list/" class="nav-link {% if request.path == '/smtp_list/' %}active{% endif %}">Server List</a></li>
+      </ul>
+    </div>
+  </li>
+
+  <!-- List Section -->
+  <li class="nav-item {% if '/list' in request.path %}active{% endif %}">
+    <a class="nav-link" data-bs-toggle="collapse" href="#listMenu" role="button" aria-expanded="false" aria-controls="listMenu">
+      <i class="bi bi-list-ul"></i> List
+    </a>
+    <div class="collapse {% if '/list' in request.path %}show{% endif %}" id="listMenu">
+      <ul class="list-unstyled ps-4">
+        <li><a href="/add_list/" class="nav-link {% if request.path == '/add_list/' %}active{% endif %}">Add List</a></li>
+        <li><a href="/emaiil_lists/" class="nav-link {% if request.path == '/email_lists/' %}active{% endif %}">All Lists</a></li>
+      </ul>
+    </div>
+  </li>
+
+  <!-- Template Section -->
+  <li class="nav-item {% if '/template' in request.path %}active{% endif %}">
+    <a class="nav-link" data-bs-toggle="collapse" href="#templateMenu" role="button" aria-expanded="false" aria-controls="templateMenu">
+      <i class="bi bi-file-earmark-text"></i> Template
+    </a>
+    <div class="collapse {% if '/template' in request.path %}show{% endif %}" id="templateMenu">
+      <ul class="list-unstyled ps-4">
+        <li><a href="/add_template/" class="nav-link {% if request.path == '/add_template/' %}active{% endif %}">Add Template</a></li>
+        <li><a href="/template_list/" class="nav-link {% if request.path == '/template_list/' %}active{% endif %}">Template List</a></li>
+      </ul>
+    </div>
+  </li>
+
+  <!-- Campaign Section -->
+  <li class="nav-item {% if '/campaign' in request.path %}active{% endif %}">
+    <a class="nav-link" data-bs-toggle="collapse" href="#campaignMenu" role="button" aria-expanded="false" aria-controls="campaignMenu">
+      <i class="bi bi-megaphone"></i> Campaign
+    </a>
+    <div class="collapse {% if '/campaign' in request.path %}show{% endif %}" id="campaignMenu">
+      <ul class="list-unstyled ps-4">
+        <li><a href="/create_campaign/" class="nav-link {% if request.path == '/create_campaign/' %}active{% endif %}">Create Campaign</a></li>
+        <li><a href="/campaign_list/" class="nav-link {% if request.path == '/campaign_list/' %}active{% endif %}">Campaign List</a></li>
+      </ul>
+    </div>
+  </li>
+
+      <li class="nav-item">
+        <a href="#" class="nav-link"><i class="bi bi-people"></i>Subscribers</a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link"><i class="bi bi-gear"></i>Settings</a>
+      </li>
+
+</ul> {% endcomment %}
+
+<div class="nav-scroll">
+
+<ul class="nav-menu">
+
+  <!-- Dashboard -->
+  <li class="nav-item {% if request.path == '/userhome/' %}active{% endif %}">
+    <a href="/userhome/" class="nav-link"><i class="bi bi-grid-3x3-gap-fill"></i> Dashboard</a>
+  </li>
+
+  <!-- Server -->
+  <li class="nav-item {% if '/add_server' in request.path or '/smtp_list/' in request.path %}active{% endif %}">
+    <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#serverMenu" role="button"
+       aria-expanded="{% if '/add_server' in request.path or '/smtp_list/' in request.path %}true{% else %}false{% endif %}"
+       aria-controls="serverMenu">
+      <span><i class="bi bi-server"></i> Server</span>
+      <i class="bi bi-chevron-down"></i>
+    </a>
+    <div class="collapse {% if '/add_server' in request.path or '/smtp_list/' in request.path %}show{% endif %}" id="serverMenu">
+      <ul class="list-unstyled ps-4">
+        <li><a href="/add_server/" class="nav-link {% if request.path == '/add_server/' %}active text-primary fw-bold{% endif %}">Add Server</a></li>
+        <li><a href="/smtp_list/" class="nav-link {% if request.path == '/smtp_list/' %}active text-primary fw-bold{% endif %}">Server List</a></li>
+      </ul>
+    </div>
+  </li>
+
+  <!-- List -->
+  <li class="nav-item {% if '/add_list' in request.path or '/email_lists' in request.path or '/edit_email_list/' in request.path %}active{% endif %}">
+    <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#listMenu" role="button"
+       aria-expanded="{% if '/add_list' in request.path or '/email_lists' in request.path %}true{% else %}false{% endif %}"
+       aria-controls="listMenu">
+      <span><i class="bi bi-list-ul"></i> List</span>
+      <i class="bi bi-chevron-down"></i>
+    </a>
+    <div class="collapse {% if '/add_list' in request.path or '/email_lists' in request.path %}show{% endif %}" id="listMenu">
+      <ul class="list-unstyled ps-4">
+        <li><a href="/add_list/" class="nav-link {% if request.path == '/add_list/' %}active text-primary fw-bold{% endif %}">Add List</a></li>
+        <li><a href="/email_lists/" class="nav-link {% if request.path == '/email_lists/' %}active text-primary fw-bold{% endif %}">All Lists</a></li>
+      </ul>
+    </div>
+  </li>
+
+  <!-- Template -->
+  <li class="nav-item {% if '/add_template' in request.path or '/template_list/' in request.path or '/edit_template/' in request.path %}active{% endif %}">
+    <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#templateMenu" role="button"
+       aria-expanded="{% if '/add_template' in request.path or '/template_list/' in request.path %}true{% else %}false{% endif %}"
+       aria-controls="templateMenu">
+      <span><i class="bi bi-file-earmark-text"></i> Template</span>
+      <i class="bi bi-chevron-down"></i>
+    </a>
+    <div class="collapse {% if '/add_template' in request.path or '/template_list/' in request.path %}show{% endif %}" id="templateMenu">
+      <ul class="list-unstyled ps-4">
+        <li><a href="/add_template/" class="nav-link {% if request.path == '/add_template/' %}active text-primary fw-bold{% endif %}">Add Template</a></li>
+        <li><a href="/template_list/" class="nav-link {% if request.path == '/template_list/' %}active text-primary fw-bold{% endif %}">Template List</a></li>
+      </ul>
+    </div>
+  </li>
+
+  <!-- Campaign -->
+  <li class="nav-item {% if '/create_campaign' in request.path or '/campaign_list/' in request.path %}active{% endif %}">
+    <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#campaignMenu" role="button"
+       aria-expanded="{% if '/create_campaign' in request.path or '/campaign_list/' in request.path %}true{% else %}false{% endif %}"
+       aria-controls="campaignMenu">
+      <span><i class="bi bi-megaphone"></i> Campaign</span>
+      <i class="bi bi-chevron-down"></i>
+    </a>
+    <div class="collapse {% if '/create_campaign' in request.path or '/campaign_list/' in request.path or '/edit_template/' in request.path %}show{% endif %}" id="campaignMenu">
+      <ul class="list-unstyled ps-4">
+        <li><a href="/create_campaign/" class="nav-link {% if request.path == '/create_campaign/' %}active text-primary fw-bold{% endif %}">Create Campaign</a></li>
+        <li><a href="/campaign_list/" class="nav-link {% if request.path == '/campaign_list/' %}active text-primary fw-bold{% endif %}">Campaign List</a></li>
+      </ul>
+    </div>
+  </li>
+
+  <!-- Static Items -->
+  {% comment %} <li class="nav-item">
+    <a href="#" class="nav-link"><i class="bi bi-people"></i> Subscribers</a>
+  </li> {% endcomment %}
+
+    <li class="nav-item {% if request.path == '/chat/' %}active{% endif %}">
+        <a href="/chat/" class="nav-link" ><i class="bi bi-headset"></i> 	Need Help?</a>
+  </li>
+
+  <li class="nav-item {% if request.path == '/user_profile/' %}active{% endif %}">
+    <a href="/user_profile/" class="nav-link"><i class="bi bi-person-circle me-2"></i> Profile</a>
+  </li>
+
+  <li class="nav-item {% if request.path == '/logout/' %}active{% endif %}">
+    <a href="/logout/" class="nav-link"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
+  </li>
+
+</ul>
+
+</div>
+
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Bar -->
+     {% block topbar1 %}
+
+    <div class="top-bar">
+      <div class="container text-center">
+        <h3 class="fw-bold text-primary">Keddy Mailer - User Dashboard</h3>
+        <p class="lead mb-1"><b>Welcome to your Campaign Control Center</b></p>
+        <p class="mt-1">Manage email lists, design campaigns, and track your email performance — all from one place.</p>
+      </div>
+      <div class="top-bar-actions">
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <b>Profile</b>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="/user_profile/">View</a></li>
+            <li><a class="dropdown-item" href="/edit_user_profile/">Edit</a></li>
+          </ul>
+        </div>
+        <a href="/logout/" style="all: unset; cursor: pointer;">
+          <button class="btn btn-danger"><i class="bi bi-box-arrow-right"></i> Logout</button>
+        </a>
+      </div>
+    </div>
+    {% endblock %}
+
+
+      {% block summary_content %}
+
+  <style>
+
+    .summary-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      height: auto;
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .card-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .card-change {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .card-change.positive {
+      color: #10b981;
+    }
+
+    .card-change.negative {
+      color: #ef4444;
+    }
+
+    .change-text {
+      color: #6b7280;
+      margin-left: 8px;
+      font-weight: 400;
+    }
+  </style>
+
+
+<div class="container">
+  <div class="row">
+    <!-- Total Emails Sent -->
+    <div class="col-md-4">
+      <div class="summary-card">
+        <div class="card-header">
+          <span class="card-title">Total Emails Sent</span>
+          <i class="bi bi-three-dots"></i>
+        </div>
+        <div class="card-value" data-target="{{ total_sent|default:0 }}">0</div>
+        <div class="card-change positive">
+          <i class="bi bi-arrow-up"></i>
+          Active <span class="change-text">Campaigns</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Emails Sent -->
+    <div class="col-md-4">
+      <div class="summary-card">
+        <div class="card-header">
+          <span class="card-title">Monthly Emails Sent</span>
+          <i class="bi bi-three-dots"></i>
+        </div>
+        <div class="card-value" data-target="{{ monthly_sent|default:0 }}">0</div>
+        <div class="card-change negative">
+          <i class="bi bi-clock"></i>
+          This Month <span class="change-text">Tracking</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Click Rate -->
+    <div class="col-md-4">
+      <div class="summary-card">
+        <div class="card-header">
+          <span class="card-title">Click Rate</span>
+          <i class="bi bi-three-dots"></i>
+        </div>
+        <div class="card-value" data-target="{{ monthly_clicked|floatformat:1|default:0|cut:'%' }}">0</div>
+        <div class="card-change positive">
+          <i class="bi bi-graph-up-arrow"></i>
+          {{ click_rate }} <span class="change-text">CTR</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+  <!-- JS for Animation -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    function animateCounter(el) {
+      const target = parseFloat(el.getAttribute('data-target')) || 0;
+      let count = 0;
+      const increment = target / 100;
+
+      const update = () => {
+        count += increment;
+        if (count >= target) {
+          el.textContent = target % 1 === 0 ? target : target.toFixed(1);
+        } else {
+          el.textContent = Math.floor(count);
+          requestAnimationFrame(update);
+        }
+      };
+
+      update();
+    }
+
+    document.querySelectorAll('.card-value').forEach(el => animateCounter(el));
+  });
+  </script>
+
+      {% endblock %}
+
+
+
+
+      {% block outermain %}
+    <!-- Block Main (your custom content goes here) -->
+    <div class="statistics-section">
+      {% block main %}
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+
+ {% comment %} <div class="card"> {% endcomment %}
+   <div class="container mt-4">
+  <div class="card-body">
+    <canvas id="lineChart" height="450" style="display: block; box-sizing: border-box; height: 225px; width: 676px;" width="1352"></canvas>
+  </div>
+</div>
+
+<script>
+  const ctx = document.getElementById("lineChart").getContext("2d");
+
+  const lineChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: {{ labels|safe }},
+      datasets: [
+        {
+          label: 'Campaigns Sent',
+          data: {{ campaigns_data|safe }},
+          borderColor: '#4caf50',
+          backgroundColor: 'rgba(76, 175, 80, 0.1)',
+          tension: 0.4,
+          fill: true
+        },
+        {
+          label: 'Emails Sent',
+          data: {{ emails_data|safe }},
+          borderColor: '#2196f3',
+          backgroundColor: 'rgba(33, 150, 243, 0.1)',
+          tension: 0.4,
+          fill: true
+        },
+        {
+          label: 'Clicks',
+          data: {{ clicks_data|safe }},
+          borderColor: '#ff9800',
+          backgroundColor: 'rgba(255, 152, 0, 0.1)',
+          tension: 0.4,
+          fill: true
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' },
+        
+            title: {
+         display: true,
+        text: ' Email Performance Overview (Monthly & Daily)',
+        font: { size: 18 }
+    }
+
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { stepSize: 1 }
+        }
+      }
+    }
+  });
+</script>
+
+
+      {% endblock %}
+    </div>
+    {% endblock %}
+
+    {% block top_campaigns %}
+
+
+<div class="card mt-4 shadow-sm">
+  <div class="card-header bg-success text-white">
+    <h5 class="mb-0">Top 5 Campaigns by Click Rate</h5>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Campaign Name</th>
+            <th>Clicked</th>
+            <th>Sent</th>
+            <th>Click Rate (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for campaign in top_campaigns %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ campaign.name }}</td>
+            <td>{{ campaign.total_clicked }}</td>
+            <td>{{ campaign.total_sent }}</td>
+            <td>{{ campaign.click_rate|floatformat:2 }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center">No campaigns found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+    {% endblock %}
+
+  </main>
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

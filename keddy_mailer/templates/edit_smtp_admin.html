@@ -1,0 +1,80 @@
+{% extends "adminhome.html" %}
+
+{% block summary_content %}{% endblock %}
+
+{% comment %} {% block outermain %}{% endblock %}
+
+{% block main %}{% endblock %} {% endcomment %}
+
+{% block top_campaigns %}{% endblock %}
+
+{% block main %}
+
+<div class="card shadow border-0">
+  <div class="card-header bg-success text-white">
+    <h5 class="mb-0">Edit SMTP Server</h5>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+    <div class="card-body row g-3">
+
+      <div class="col-md-6">
+        <label class="form-label">Server Name</label>
+        <input type="text" name="name" class="form-control" value="{{ smtp.name }}" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Host</label>
+        <input type="text" name="host" class="form-control" value="{{ smtp.host }}" required>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Port</label>
+        <input type="number" name="port" class="form-control" value="{{ smtp.port }}" required>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Username</label>
+        <input type="text" name="username" class="form-control" value="{{ smtp.username }}" required>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Password</label>
+        <input type="text" name="password" class="form-control" value="{{ smtp.password }}" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">From Email</label>
+        <input type="email" name="from_email" class="form-control" value="{{ smtp.from_email }}" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">SMTP Server</label>
+        <input type="text" name="smtp_server" class="form-control" value="{{ smtp.smtp_server }}" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Emails Per Hour</label>
+        <input type="number" name="emails_per_hour" class="form-control" value="{{ smtp.emails_per_hour }}" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Security</label>
+        <select name="security" class="form-select" required>
+          <option value="None" {% if smtp.security == "None" %}selected{% endif %}>None</option>
+          <option value="SSL" {% if smtp.security == "SSL" %}selected{% endif %}>SSL</option>
+          <option value="TLS" {% if smtp.security == "TLS" %}selected{% endif %}>TLS</option>
+        </select>
+      </div>
+
+    </div>
+
+    <div class="card-footer d-flex justify-content-between">
+      <a href="{% url 'all_server_admin' %}" class="btn btn-secondary">← Back</a>
+      <button type="submit" class="btn btn-success">💾 Save Changes</button>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

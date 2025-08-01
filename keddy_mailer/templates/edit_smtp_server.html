@@ -1,0 +1,101 @@
+{% extends "userhome.html" %}
+
+{% load static %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}
+{% endblock %}
+{% block top_campaigns %} {% endblock %}
+
+{% block main %}
+<div class="card shadow-sm">
+  <div class="card-header text-white" style="background:#3b82f6">
+    <h5 class="mb-0">Edit Email Server</h5>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+    {% if messages %}
+      <div class="p-2">
+        {% for message in messages %}
+          <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
+               role="alert" 
+               style="border-radius: 8px; font-weight: 500;">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="card-body row g-3">
+      <div class="col-md-6">
+        <label class="form-label" style="font-weight:bolder; color:gray;">Server Name</label>
+        <input type="text" name="name" class="form-control" value="{{ server.name }}" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" style="font-weight:bolder; color:gray;">From Email</label>
+        <input type="text" name="from_email" class="form-control" value="{{ server.from_email }}" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" style="font-weight:bolder; color:gray;">SMTP Host</label>
+        <input type="text" name="host" class="form-control" value="{{ server.host }}" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" style="font-weight:bolder; color:gray;">Emails Per Hour</label>
+        <input type="number" name="emails_per_hour" class="form-control" value="{{ server.emails_per_hour }}" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" style="font-weight:bolder; color:gray;">SMTP Server</label>
+        <input type="text" name="smtp_server" class="form-control" value="{{ server.smtp_server }}" required>
+      </div>
+
+      <!-- Disabled Username & Password -->
+      <div class="col-md-6">
+        <label class="form-label" style="font-weight:bolder; color:gray;">Username</label>
+        <input type="text" class="form-control" value="{{ server.username }}" disabled>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" style="font-weight:bolder; color:gray;">Password</label>
+        <input type="password" class="form-control" value="********" disabled>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" style="font-weight:bolder; color:gray;">Port</label>
+        <select name="port" class="form-select" required>
+          <option value="587" {% if server.port == '587' %}selected{% endif %}>587</option>
+          <option value="465" {% if server.port == '465' %}selected{% endif %}>465</option>
+          <option value="25" {% if server.port == '25' %}selected{% endif %}>25</option>
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" style="font-weight:bolder; color:gray;">Security</label>
+        <select name="security" class="form-select" required>
+          <option value="TLS" {% if server.security == 'TLS' %}selected{% endif %}>TLS</option>
+          <option value="SSL" {% if server.security == 'SSL' %}selected{% endif %}>SSL</option>
+          <option value="none" {% if server.security == 'none' %}selected{% endif %}>None</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card-footer d-flex justify-content-between flex-wrap">
+      <a href="/userhome/" class="btn btn-secondary">← Cancel</a>
+      <button type="submit" 
+        class="btn" 
+        style="background-color: #37AFE1; color: white; min-width: 120px; height: 40px; padding: 8px 20px; font-size: 16px; border: none;">
+        Save Changes
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

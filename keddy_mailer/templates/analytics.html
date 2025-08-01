@@ -1,0 +1,24 @@
+{% extends "userhome.html" %}
+{% block main %}
+  <h2 style="margin:20px 0;">📊 Campaign Analytics</h2>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Campaign Name</th>
+        <th>Total Sent</th>
+        <th>Opens</th>
+        <th>Clicks</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in data %}
+        <tr>
+          <td>{{ row.name }}</td>
+          <td>{{ row.sent }}</td>
+          <td>{{ row.opened }}</td>
+          <td>{{ row.clicked }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

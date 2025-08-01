@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat with Admin</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+    }
+    .chat-container {
+      width: 400px;
+      margin: 50px auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+      padding: 20px;
+    }
+    .chat-box {
+      height: 300px;
+      overflow-y: scroll;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #fafafa;
+    }
+    .message {
+      margin: 5px 0;
+    }
+    .sent { text-align: right; color: blue; }
+    .received { text-align: left; color: green; }
+    input[type="text"] {
+      width: 80%;
+      padding: 5px;
+    }
+    button {
+      padding: 5px 10px;
+    }
+  </style>
+</head>
+<body>
+<div class="chat-container">
+  <h3>Chat with Admin</h3>
+  <div class="chat-box" id="chat-box"></div>
+  <input type="text" id="message-input" placeholder="Type your message..." />
+  <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+  const receiverEmail = "admin@example.com";
+
+  function fetchMessages() {
+    $.get("/fetch-messages/", function (res) {
+      if (res.status === "success") {
+        const chatBox = $("#chat-box");
+        chatBox.html("");
+        res.messages.forEach(m => {
+          const cls = m.sender === receiverEmail ? "received" : "sent";
+          chatBox.append(`<div class="message ${cls}"><strong>${m.sender}:</strong> ${m.message}</div>`);
+        });
+        chatBox.scrollTop(chatBox[0].scrollHeight);
+      }
+    });
+  }
+
+  function sendMessage() {
+    const msg = $("#message-input").val().trim();
+    if (msg === "") return;
+
+    $.ajax({
+      url: "/send-message/",
+      method: "POST",
+      headers: { "X-CSRFToken": "{{ csrf_token }}" },
+      data: JSON.stringify({
+        receiver_email: receiverEmail,
+        message: msg
+      }),
+      contentType: "application/json",
+      success: function (res) {
+        if (res.status === "success") {
+          $("#message-input").val("");
+          fetchMessages();
+        }
+      }
+    });
+  }
+
+  // Auto-refresh every 3 seconds
+  setInterval(fetchMessages, 3000);
+  fetchMessages();
+</script>
+</body>
+</html>

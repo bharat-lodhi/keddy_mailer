@@ -1,0 +1,34 @@
+{% extends "userhome.html" %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}
+{% endblock %}
+{% block top_campaigns %} {% endblock %}
+
+{% block main %}
+<div class="container" style="max-width: 600px;">
+  <div class="card shadow">
+    <div class="card-header text-white" style="background-color: #3B82F6;">
+      <h5>Edit List Name</h5>
+    </div>
+    <div class="card-body">
+      <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="list_name" class="form-label" style="font-weight:bolder; color:gray;">New List Name</label>
+          <input type="text" name="list_name" id="list_name" class="form-control" value="{{ email_obj.list_name }}" required>
+        </div>
+        <div class="d-flex justify-content-between">
+          <a href="/email_lists/" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-success">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

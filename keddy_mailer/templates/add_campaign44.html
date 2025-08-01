@@ -1,0 +1,676 @@
+{% extends "userhome.html" %}
+
+{% block table %}
+{% endblock %}
+
+
+{% block main %}
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #4cc9f0;
+            --light-bg: #f8f9fa;
+            --border-color: #e9ecef;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .campaign-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: none;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem;
+            border-bottom: none;
+        }
+        
+        .card-header h1 {
+            font-weight: 600;
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+        }
+        
+        .option-separator {
+            color: #6c757d;
+            font-weight: 500;
+            text-align: center;
+            padding: 0 1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            border-radius: 8px;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-outline-secondary {
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+        }
+        
+        /* Attachment styles */
+        .attachment-container {
+            border: 2px dashed #adb5bd;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+            background-color: var(--light-bg);
+        }
+        
+        .attachment-container.drag-over {
+            border-color: var(--primary-color);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        .attachment-preview {
+            margin-top: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        
+        .attachment-item {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+        }
+        
+        .remove-attachment {
+            color: #e63946;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .browse-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1.25rem;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            border: none;
+            font-weight: 500;
+        }
+        
+        .browse-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+        
+        .file-icon {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+        
+        .schedule-container {
+            background-color: var(--light-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .form-section {
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .section-title i {
+            font-size: 1.25rem;
+        }
+        
+        .btn-group-custom {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn-group-custom .btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-send {
+            background-color: #2a9d8f;
+            border-color: #2a9d8f;
+        }
+        
+        .btn-send:hover {
+            background-color: #21867a;
+            border-color: #21867a;
+        }
+        
+        .btn-schedule {
+            background-color: #f4a261;
+            border-color: #f4a261;
+        }
+        
+        .btn-schedule:hover {
+            background-color: #e76f51;
+            border-color: #e76f51;
+        }
+        
+        @media (max-width: 768px) {
+            .option-separator {
+                padding: 1rem 0;
+                display: block;
+                width: 100%;
+            }
+            
+            .btn-group-custom {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+
+    
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="campaign-card">
+                    <div class="card-header">
+                        <h1><i class="bi bi-send-fill me-2"></i>Create New Email Campaign</h1>
+                    </div>
+                    <div class="card-body">
+                        <form id="campaignForm">
+                            <!-- Campaign Info Section -->
+                            <div class="form-section">
+                                <h3 class="section-title"><i class="bi bi-info-circle"></i>Campaign Information</h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="campaignName" class="form-label">Campaign Name</label>
+                                        <input type="text" class="form-control" id="campaignName" required placeholder="e.g. Summer Sale 2023">
+                                        <div class="form-text">Give your campaign a descriptive name</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="replyTo" class="form-label">Reply-To Email</label>
+                                        <input type="email" class="form-control" id="replyTo" required placeholder="reply@example.com">
+                                        <div class="form-text">Where replies should be sent</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Recipients Section -->
+                            <div class="form-section">
+                                <h3 class="section-title"><i class="bi bi-people-fill"></i>Recipients</h3>
+                                
+                                <div class="row align-items-center mb-3">
+                                    <div class="col-md-5">
+                                        <label for="recipientList" class="form-label">Select from existing lists</label>
+                                        <select class="form-select" id="recipientList">
+                                            <option value="">-- Select List --</option>
+                                            <option value="all">All Subscribers (2,451)</option>
+                                            <option value="active">Active Users (1,892)</option>
+                                            <option value="inactive">Inactive Users (559)</option>
+                                            <option value="customers">Customers (1,024)</option>
+                                            <option value="prospects">Prospects (427)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <span class="option-separator">OR</span>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label for="customRecipients" class="form-label">Enter custom emails</label>
+                                        <textarea class="form-control" id="customRecipients" rows="3" placeholder="Enter emails, one per line"></textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="alert alert-info d-flex align-items-center">
+                                    <i class="bi bi-info-circle-fill me-2"></i>
+                                    <div>You can upload a CSV file with emails by clicking the "Attachments" section below</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Email Content Section -->
+                            <div class="form-section">
+                                <h3 class="section-title"><i class="bi bi-envelope-fill"></i>Email Content</h3>
+                                
+                                <div class="row align-items-start mb-4">
+                                    <div class="col-md-5">
+                                        <label for="emailTemplate" class="form-label">Choose a template</label>
+                                        <select class="form-select" id="emailTemplate">
+                                            <option value="">-- Select Template --</option>
+                                            <option value="newsletter">Monthly Newsletter</option>
+                                            <option value="promo">Promotional Offer</option>
+                                            <option value="welcome">Welcome Series</option>
+                                            <option value="transactional">Transactional</option>
+                                        </select>
+                                        <div class="form-text">Pre-designed email templates</div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <span class="option-separator">OR</span>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label for="customContent" class="form-label">Custom content</label>
+                                        <textarea class="form-control" id="customContent" rows="5" placeholder="Write your email content here..."></textarea>
+                                        <div class="form-text">HTML editor would appear here</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="emailSubject" class="form-label">Email Subject</label>
+                                        <input type="text" class="form-control" id="emailSubject" placeholder="Enter email subject line">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="preheader" class="form-label">Preheader Text</label>
+                                        <input type="text" class="form-control" id="preheader" placeholder="Short preview text">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- SMTP Settings -->
+                            <div class="form-section">
+                                <h3 class="section-title"><i class="bi bi-gear-fill"></i>Delivery Settings</h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="smtpServer" class="form-label">SMTP Server</label>
+                                        <select class="form-select" id="smtpServer" required>
+                                            <option value="">-- Select SMTP Server --</option>
+                                            <option value="primary">Primary SMTP (mail.example.com)</option>
+                                            <option value="secondary">Secondary SMTP (backup.example.com)</option>
+                                            <option value="transactional">Transactional SMTP (tx.example.com)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="senderName" class="form-label">Sender Name</label>
+                                        <input type="text" class="form-control" id="senderName" placeholder="Your Company Name">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="trackOpens">
+                                    <label class="form-check-label" for="trackOpens">
+                                        Track email opens
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="trackClicks">
+                                    <label class="form-check-label" for="trackClicks">
+                                        Track link clicks
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Attachments Section -->
+                            <div class="form-section">
+                                <h3 class="section-title"><i class="bi bi-paperclip"></i>Attachments</h3>
+                                
+                                <div id="attachmentContainer" class="attachment-container">
+                                    <i class="bi bi-cloud-arrow-up file-icon"></i>
+                                    <h5>Drag & drop files here</h5>
+                                    <p class="text-muted">or</p>
+                                    <label for="fileInput" class="browse-btn">
+                                        <i class="bi bi-folder2-open"></i> Browse Files
+                                    </label>
+                                    <input type="file" id="fileInput" multiple>
+                                    <div id="attachmentPreview" class="attachment-preview"></div>
+                                </div>
+                                <div class="form-text">Maximum file size: 25MB. Supported formats: PDF, DOCX, XLSX, JPG, PNG</div>
+                            </div>
+                            
+                            <!-- Schedule Options (hidden by default) -->
+                            <div id="scheduleOptions" class="schedule-container" style="display: none;">
+                                <h5 class="mb-3"><i class="bi bi-clock-fill me-2"></i>Schedule Campaign</h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="scheduleDate" class="form-label">Date & Time</label>
+                                        <input type="datetime-local" class="form-control" id="scheduleDate">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="timezone" class="form-label">Timezone</label>
+                                        <select class="form-select" id="timezone">
+                                            <option value="UTC">UTC</option>
+                                            <option value="EST" selected>Eastern Time (EST)</option>
+                                            <option value="CST">Central Time (CST)</option>
+                                            <option value="PST">Pacific Time (PST)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="sendTestEmail">
+                                    <label class="form-check-label" for="sendTestEmail">
+                                        Send test email before scheduling
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="btn-group-custom">
+                                <button type="submit" class="btn btn-send text-white">
+                                    <i class="bi bi-send-fill"></i> Send Now
+                                </button>
+                                <button type="button" class="btn btn-schedule text-white" id="scheduleBtn">
+                                    <i class="bi bi-calendar-plus"></i> Schedule
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary">
+                                    <i class="bi bi-save"></i> Save Draft
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Attachment functionality
+        const attachmentContainer = document.getElementById('attachmentContainer');
+        const fileInput = document.getElementById('fileInput');
+        const attachmentPreview = document.getElementById('attachmentPreview');
+        const attachments = [];
+        
+        // Handle drag and drop
+        ['dragover', 'dragenter'].forEach(event => {
+            attachmentContainer.addEventListener(event, (e) => {
+                e.preventDefault();
+                attachmentContainer.classList.add('drag-over');
+            });
+        });
+        
+        ['dragleave', 'dragend', 'drop'].forEach(event => {
+            attachmentContainer.addEventListener(event, () => {
+                attachmentContainer.classList.remove('drag-over');
+            });
+        });
+        
+        attachmentContainer.addEventListener('drop', (e) => {
+            e.preventDefault();
+            handleFiles(e.dataTransfer.files);
+        });
+        
+        // Handle file selection
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                handleFiles(fileInput.files);
+            }
+        });
+        
+        // Process selected files
+        function handleFiles(files) {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                // Check file size (25MB max)
+                if (file.size > 25 * 1024 * 1024) {
+                    alert(`File ${file.name} is too large (max 25MB)`);
+                    continue;
+                }
+                
+                // Check file type
+                const validTypes = ['application/pdf', 'application/msword', 
+                                   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                   'application/vnd.ms-excel', 
+                                   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                   'image/jpeg', 'image/png'];
+                
+                if (!validTypes.includes(file.type)) {
+                    alert(`File type not supported: ${file.name}`);
+                    continue;
+                }
+                
+                if (!attachments.some(att => att.name === file.name && att.size === file.size)) {
+                    attachments.push(file);
+                    renderAttachment(file);
+                }
+            }
+        }
+        
+        // Display attachment preview
+        function renderAttachment(file) {
+            const attachmentItem = document.createElement('div');
+            attachmentItem.className = 'attachment-item';
+            
+            // Get appropriate icon for file type
+            let fileIcon = 'bi-file-earmark';
+            if (file.type.includes('image')) fileIcon = 'bi-file-image';
+            else if (file.type.includes('pdf')) fileIcon = 'bi-file-pdf';
+            else if (file.type.includes('word')) fileIcon = 'bi-file-word';
+            else if (file.type.includes('excel')) fileIcon = 'bi-file-excel';
+            
+            attachmentItem.innerHTML = `
+                <i class="bi ${fileIcon}"></i>
+                <span>${file.name}</span>
+                <small class="text-muted">(${formatFileSize(file.size)})</small>
+                <span class="remove-attachment" data-name="${file.name}">&times;</span>
+            `;
+            attachmentPreview.appendChild(attachmentItem);
+            
+            // Add remove functionality
+            attachmentItem.querySelector('.remove-attachment').addEventListener('click', (e) => {
+                const fileName = e.target.getAttribute('data-name');
+                const index = attachments.findIndex(att => att.name === fileName);
+                if (index !== -1) {
+                    attachments.splice(index, 1);
+                }
+                attachmentItem.remove();
+            });
+        }
+        
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Toggle schedule options
+        document.getElementById('scheduleBtn').addEventListener('click', function() {
+            const scheduleOptions = document.getElementById('scheduleOptions');
+            const isVisible = scheduleOptions.style.display === 'block';
+            
+            scheduleOptions.style.display = isVisible ? 'none' : 'block';
+            this.innerHTML = isVisible 
+                ? '<i class="bi bi-calendar-plus"></i> Schedule' 
+                : '<i class="bi bi-x-circle"></i> Cancel Schedule';
+                
+            if (!isVisible) {
+                // Set default schedule time to next hour
+                const now = new Date();
+                now.setHours(now.getHours() + 1);
+                now.setMinutes(0);
+                
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                
+                document.getElementById('scheduleDate').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+                document.getElementById('scheduleDate').focus();
+            }
+        });
+        
+        // Form submission
+        document.getElementById('campaignForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate at least one recipient option is selected
+            const recipientList = document.getElementById('recipientList').value;
+            const customRecipients = document.getElementById('customRecipients').value;
+            
+            if (!recipientList && !customRecipients) {
+                alert('Please select a recipient list or enter custom recipients');
+                return;
+            }
+            
+            // Validate at least one content option is selected
+            const emailTemplate = document.getElementById('emailTemplate').value;
+            const customContent = document.getElementById('customContent').value;
+            
+            if (!emailTemplate && !customContent) {
+                alert('Please select a template or enter custom content');
+                return;
+            }
+            
+            // Check if scheduling
+            const isScheduling = document.getElementById('scheduleOptions').style.display === 'block';
+            
+            // Prepare form data (including attachments)
+            const formData = new FormData();
+            formData.append('campaignName', document.getElementById('campaignName').value);
+            formData.append('replyTo', document.getElementById('replyTo').value);
+            formData.append('recipientList', recipientList);
+            formData.append('customRecipients', customRecipients);
+            formData.append('smtpServer', document.getElementById('smtpServer').value);
+            formData.append('emailTemplate', emailTemplate);
+            formData.append('customContent', customContent);
+            formData.append('emailSubject', document.getElementById('emailSubject').value);
+            formData.append('preheader', document.getElementById('preheader').value);
+            formData.append('senderName', document.getElementById('senderName').value);
+            formData.append('trackOpens', document.getElementById('trackOpens').checked);
+            formData.append('trackClicks', document.getElementById('trackClicks').checked);
+            
+            // Add attachments
+            attachments.forEach((file, index) => {
+                formData.append(`attachments[${index}]`, file);
+            });
+            
+            if (isScheduling) {
+                const scheduleDate = document.getElementById('scheduleDate').value;
+                if (!scheduleDate) {
+                    alert('Please select a schedule date and time');
+                    return;
+                }
+                formData.append('scheduleDate', scheduleDate);
+                formData.append('timezone', document.getElementById('timezone').value);
+                formData.append('sendTestEmail', document.getElementById('sendTestEmail').checked);
+                
+                alert(`Campaign "${document.getElementById('campaignName').value}" with ${attachments.length} attachments scheduled for ${scheduleDate}`);
+            } else {
+                alert(`Campaign "${document.getElementById('campaignName').value}" with ${attachments.length} attachments will be sent immediately!`);
+            }
+            
+            // In a real application, you would send the formData to your server
+            console.log('Form data would be submitted here', formData);
+            
+            // For demo purposes, show a success message
+            const successAlert = document.createElement('div');
+            successAlert.className = 'alert alert-success mt-4';
+            successAlert.innerHTML = `
+                <i class="bi bi-check-circle-fill me-2"></i>
+                Campaign successfully ${isScheduling ? 'scheduled' : 'sent'}!
+                <button type="button" class="btn-close float-end" data-bs-dismiss="alert"></button>
+            `;
+            this.appendChild(successAlert);
+            
+            // Reset form after 3 seconds
+            setTimeout(() => {
+                this.reset();
+                attachments.length = 0;
+                attachmentPreview.innerHTML = '';
+                document.getElementById('scheduleOptions').style.display = 'none';
+                document.getElementById('scheduleBtn').innerHTML = '<i class="bi bi-calendar-plus"></i> Schedule';
+                successAlert.remove();
+            }, 3000);
+        });
+        
+        // Toggle between template and custom content
+        document.getElementById('emailTemplate').addEventListener('change', function() {
+            if (this.value) {
+                document.getElementById('customContent').value = '';
+                // In a real app, you would load the template content
+                if (this.value === 'newsletter') {
+                    document.getElementById('emailSubject').value = 'Our Monthly Newsletter';
+                } else if (this.value === 'promo') {
+                    document.getElementById('emailSubject').value = 'Special Offer Just For You!';
+                }
+            }
+        });
+        
+        document.getElementById('customContent').addEventListener('focus', function() {
+            document.getElementById('emailTemplate').value = '';
+        });
+        
+        // Toggle between recipient list and custom recipients
+        document.getElementById('recipientList').addEventListener('change', function() {
+            if (this.value) {
+                document.getElementById('customRecipients').value = '';
+            }
+        });
+        
+        document.getElementById('customRecipients').addEventListener('focus', function() {
+            document.getElementById('recipientList').value = '';
+        });
+    </script>
+
+{% endblock %}

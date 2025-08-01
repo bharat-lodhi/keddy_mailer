@@ -1,0 +1,181 @@
+{% extends "userhome.html" %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}{% endblock %}
+
+{% block main %}{% endblock %}
+{% block outermain %} {% endblock %}
+
+ 
+
+{% comment %} {% block main %}
+
+<div class="container mt-4">
+  <h2 class="mb-4">📬 SMTP Servers</h2>
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped shadow-sm rounded">
+      <thead class="table-success">
+        <tr>
+          <th>#</th>
+          <th>Server Name</th>
+          <th>Username</th>
+          <th>From Email</th>
+          <th>Host</th>
+          <th>Port</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for server in smtp_servers %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ server.name }}</td>
+            <td>{{ server.username }}</td>
+            <td>{{ server.from_email }}</td>
+            <td>{{ server.host }}</td>
+            <td>{{ server.port }}</td>
+            <td>
+              {% if server.is_active %}
+                <span class="badge bg-success">✅ Verified</span>
+              {% else %}
+                <span class="badge bg-danger">❌ Not Verified</span>
+              {% endif %}
+            </td>
+            <td>{{ server.created_at|date:"Y-m-d H:i" }}</td>
+            <td>
+              <a href="/edit_smtp/{{ server.id }}/" class="btn btn-sm btn-outline-primary">✏️ Edit</a>
+              <a href="/delete_smtp/{{ server.id }}/" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this SMTP server?');">🗑️ Delete</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="9" class="text-center text-muted">No SMTP servers found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %} {% endcomment %}
+
+
+
+
+{% block top_campaigns %}
+
+
+    {% if messages %}
+  <div style="margin-bottom: 20px;">
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
+           role="alert" 
+           style="border-radius: 8px; font-weight: 500;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+  <div class="card shadow border-0">
+    <div class="card-header text-white d-flex justify-content-between align-items-center bg-success" >
+      <h5 class="mb-0">SMTP Server List</h5>
+      <a href="/add_server/" class="btn btn-light btn-sm">
+        <i class="bi bi-plus-circle"></i> Add Server
+      </a>
+    </div>
+    <div class="card-body p-0">
+
+      <div class="table-responsive">
+
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Server Name</th>
+              <th>Username</th>
+              {% comment %} <th>Host</th>
+              <th>Port</th> {% endcomment %}
+              <th>Total Sent</th>
+
+             <th>Hr Rate</th>
+              <th>1 Hr Sent</th>
+
+
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+
+          </thead>
+          <tbody>
+            {% for item in smtp_data %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ item.smtp.name }}</td>
+              <td>{{ item.smtp.username }}</td>
+              {% comment %} <td>{{ server.from_email }}</td> {% endcomment %}
+              {% comment %} <td>{{ item.smtp.host }}</td>
+              <td>{{ item.smtp.port }}</td> {% endcomment %}
+              <td>{{ item.total_sent }}</td>
+
+            <td>{{ item.smtp.emails_per_hour }}</td>
+            <td>{{ item.last_hour_sent }}</td>
+
+              <td>
+                {% if item.smtp.is_active %}
+                  <span class="badge bg-success"><i class="bi bi-check-circle"></i> Verified</span>
+                {% else %}
+                  <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Not Verified</span>
+                {% endif %}
+              </td>
+              {% comment %} <td>{{ server.created_at|date:"M d, Y H:i" }}</td> {% endcomment %}
+              {% comment %} <td style="display:flex">
+                <a href="/edit_smtp/{{ server.id }}" class="btn btn-sm btn-outline-primary" title="Edit">
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+                <a href="/delete_smtp/{{ server.id }}" class="btn btn-sm btn-outline-danger" title="Delete"
+                   onclick="return confirm('Are you sure you want to delete this server?')">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </td>
+            </tr> {% endcomment %}
+
+<td style="display: flex; gap: 6px;">
+  <a href="/edit_smtp_server/{{ item.smtp.id }}" 
+     class="btn" 
+     title="Edit"
+     style="background-color: #37AFE1; color: white; min-width: 36px; height: 36px; padding: 6px 10px; font-size: 14px; display: flex; align-items: center; justify-content: center; border: none;">
+    <i class="bi bi-pencil-square"></i>
+  </a>
+
+  <a href="/delete_smtp/{{ item.smtp.id }}" 
+     class="btn" 
+     title="Delete"
+     onclick="return confirm('Are you sure you want to delete this server?')"
+     style="background-color: #dc3545; color: white; min-width: 36px; height: 36px; padding: 6px 10px; font-size: 14px; display: flex; align-items: center; justify-content: center; border: none;">
+    <i class="bi bi-trash"></i>
+  </a>
+</td>
+
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center text-muted">No SMTP servers found.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+
+

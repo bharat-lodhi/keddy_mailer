@@ -1,0 +1,83 @@
+{% extends "adminhome.html" %}
+
+{% block summary_content %}{% endblock %}
+
+
+
+{% block outermain %}{% endblock %}
+
+{% block main %}{% endblock %}
+
+
+{% block top_campaigns %}
+
+<div class="card shadow-sm">
+  <div class="card-header bg-success text-white">
+    <h5 class="mb-0">All Registered Users</h5>
+  </div>
+    <div class="card-body">
+
+
+ {% if messages %}
+    <div style="margin-bottom: 20px;">
+      {% for message in messages %}
+        <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
+            role="alert" 
+            style="border-radius: 8px; font-weight: 500;">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Company</th>
+            <th>Registered At</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.company }}</td>
+            <td>{{ user.created_at|date:"M d, Y H:i" }}</td>
+            <td>
+            {% if user.is_active %}
+                <a href="{% url 'toggle_user_status' user.uid %}" class="badge bg-success text-decoration-none">Active</a>
+            {% else %}
+                <a href="{% url 'toggle_user_status' user.uid %}" class="badge bg-danger text-decoration-none">Inactive</a>
+            {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'edit_user' user.uid %}" class="btn btn-sm btn-warning mb-1">
+                <i class="bi bi-pencil-square"></i> Edit
+              </a>
+              <a href="{% url 'delete_user_permanent' user.uid %}" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Are you sure?')">
+                <i class="bi bi-trash"></i> Delete
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center">No users found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

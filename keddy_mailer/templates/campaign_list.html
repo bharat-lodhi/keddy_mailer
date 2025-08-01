@@ -1,0 +1,107 @@
+{% extends "userhome.html" %}
+{% load static %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}{% endblock %}
+
+{% block main %}{% endblock %}
+
+{% block outermain %}{% endblock %}
+
+{% block top_campaigns %}
+{% comment %} <div class="container mt-4"> {% endcomment %}
+
+    {% if messages %}
+  <div style="margin-bottom: 20px;">
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
+           role="alert" 
+           style="border-radius: 8px; font-weight: 500;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+  <div class="card shadow border-0">
+    <div class="card-header text-white d-flex justify-content-between align-items-center bg-success">
+      <h5 class="mb-0">Campaigns</h5>
+      <a href="/create_campaign/" class="btn btn-light btn-sm">
+        <i class="bi bi-plus-circle"></i> Create Campaign
+      </a>
+    </div>
+    <div class="card-body p-0">
+
+      <div class="table-responsive">
+
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Subject</th>
+              <th>Status</th>
+                <th>Sent</th>
+                <th>Clicks</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+
+          </thead>
+          <tbody>
+            {% for campaign in campaigns %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ campaign.name }}</td>
+              <td>{{ campaign.subject }}</td>
+              <td>
+                {% if campaign.is_sent %}
+                  <span class="badge bg-success">Sent</span>
+                {% else %}
+                  <span class="badge bg-secondary">Panding</span>
+                {% endif %}
+              </td>
+                <td>{{ campaign.sent_count }}</td>
+                <td>{{ campaign.click_count }}</td>
+              <td>{{ campaign.created_at|date:"Y-m-d H:i" }}</td>
+
+              {% comment %} <td>
+                <a href="/delete_campaign/{{ campaign.id }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this campaign?')">
+                  <i class="bi bi-trash"></i>
+                </a>
+             </td> {% endcomment %}
+
+             <td>
+                <a href="/delete_campaign/{{ campaign.id }}" 
+                  class="btn" 
+                  title="Delete"
+                  onclick="return confirm('Delete this campaign?')"
+                  style="background-color: #dc3545; color: white; min-width: 36px; height: 36px; padding: 6px 10px; font-size: 14px; display: flex; align-items: center; justify-content: center; border: none;">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </td>
+
+
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center text-muted">No campaigns found.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% comment %} </div> {% endcomment %}
+
+{% endblock %}
+
+
+

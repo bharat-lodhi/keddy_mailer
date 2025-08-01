@@ -1,0 +1,72 @@
+{% extends "userhome.html" %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block outermain %}{% endblock %}
+{% block main %}{% endblock %}
+
+
+{% block top_campaigns %}
+
+<div class="container my-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card shadow border-0 rounded-4">
+        <div class="card-body p-4">
+          <div class="row align-items-center">
+            <div class="col-md-4 text-center">
+              <img src="{{ user.profile_image.url }}" class="img-fluid rounded-circle shadow" alt="Profile" width="160" height="160">
+              <h5 class="mt-3">{{ user.name }}</h5>
+              <span class="badge bg-primary px-3 py-2 mt-2">User</span>
+              <div class="mt-3 d-flex justify-content-center gap-2">
+                <a href="{% url 'edit_user_profile' %}" class="btn btn-outline-warning btn-sm">Edit Profile</a>
+                
+              </div>
+            </div>
+
+            <div class="col-md-8 mt-4 mt-md-0">
+              <div class="row g-3">
+                <div class="col-sm-6">
+                  <p class="mb-1 text-muted">Email</p>
+                  <h6>{{ user.email }}</h6>
+                </div>
+                <div class="col-sm-6">
+                  <p class="mb-1 text-muted">Phone</p>
+                  <h6>{{ user.number }}</h6>
+                </div>
+                <div class="col-sm-6">
+                  <p class="mb-1 text-muted">Date of Birth</p>
+                  <h6>{{ user.dob }}</h6>
+                </div>
+                <div class="col-sm-6">
+                  <p class="mb-1 text-muted">Company</p>
+                  <h6>{{ user.company }}</h6>
+                </div>
+                <div class="col-sm-12">
+                  <p class="mb-1 text-muted">Address</p>
+                  <h6>{{ user.address }}</h6>
+                </div>
+                <div class="col-sm-6">
+                  <p class="mb-1 text-muted">Total Email Credits</p>
+                  <h6><span class="badge bg-primary">{{ user.email_credit_limit }}</span></h6>
+                </div>
+                <div class="col-sm-6">
+                  <p class="mb-1 text-muted">Used Email Credits</p>
+                  <h6><span class="badge bg-danger">{{ user.used_email_credit }}</span></h6>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

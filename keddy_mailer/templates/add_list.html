@@ -1,0 +1,402 @@
+{% extends "userhome.html" %}
+
+{% load static %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}
+{% endblock %}
+
+{% block top_campaigns %} {% endblock %}
+{% comment %} 
+{% block main %}
+<style>
+  :root {
+    --primary-color: #10b981;
+    --primary-hover: #0e9e72;
+    --text-color: #1e293b;
+    --light-gray: #f0fdf4;
+    --border-color: #b8bdbb;
+    --border-radius: 8px;
+    --box-shadow: 0 6px 20px rgba(16, 185, 129, 0.1);
+    --transition: all 0.3s ease;
+  }
+
+  .form-container {
+    max-width: 1100px;
+
+    padding: 30px;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    width: 100%;
+  }
+
+  h2 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 25px;
+    font-weight: 600;
+  }
+
+  #heading1{
+    font-weight:bold;
+  }
+
+  .form-group {
+    position: relative;
+    margin-bottom: 24px;
+  }
+
+  .form-group input[type="text"] {
+    width: 100%;
+    padding: 12px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: transparent;
+    font-size: 15px;
+    outline: none;
+    transition: var(--transition);
+  }
+
+  .form-group input[type="text"]:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  }
+
+  .form-group label {
+    position: absolute;
+    top: 13px;
+    left: 12px;
+    background: white;
+    padding: 0 6px;
+    color: #6b7280;
+    font-size: 14px;
+    transition: 0.2s;
+    pointer-events: none;
+  }
+
+  .form-group input:focus + label,
+  .form-group input:not(:placeholder-shown) + label {
+    top: -10px;
+    font-size: 12px;
+    color: var(--primary-color);
+  }
+
+  #drop-zone {
+    border: 2px dashed var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    text-align: center;
+    color: #6b7280;
+    margin-bottom: 20px;
+    transition: var(--transition);
+    cursor: pointer;
+    background-color: var(--light-gray);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #drop-zone:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(16, 185, 129, 0.05);
+  }
+
+  #drop-zone.dragover {
+    background-color: rgba(52, 211, 153, 0.1);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+
+  #drop-zone i {
+    font-size: 48px;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  #drop-zone .file-info {
+    margin-top: 10px;
+    font-weight: 500;
+    color: var(--primary-color);
+  }
+
+  input[type="file"] {
+    display: none;
+  }
+
+  .btn1 {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: var(--border-radius);
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn1:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+  }
+
+  .file-requirements {
+    font-size: 14px;
+    color: #6b7280;
+    text-align: center;
+    margin-top: -15px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 576px) {
+    .form-container {
+      padding: 20px;
+    }
+
+    #drop-zone {
+      padding: 20px;
+    }
+  }
+</style>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<div class="form-container">
+  
+   {% if messages %}
+  <div style="margin-bottom: 20px;">
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
+           role="alert" 
+           style="border-radius: 8px; font-weight: 500;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+  <h2 id="heading1">Upload Your Data File</h2>
+
+  <form id="upload-form" action="/add_list/" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Floating Label Input -->
+    <div class="form-group">
+      <input type="text" id="filename" name="list_name" placeholder=" " required>
+      <label for="filename">List Name</label>
+    </div>
+
+
+    <!-- Drop Zone for File Upload -->
+    <div class="form-group">
+      <label>Select File</label>
+      <div id="drop-zone">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <div id="drop-text">Drag & Drop your file here</div>
+        <div>or</div>
+        <div class="browse-text">Browse Files</div>
+        <div id="file-info" class="file-info" style="display: none;"></div>
+      </div>
+      <div class="file-requirements">Supports: CSV, XLS, XLSX (Max 10MB)</div>
+      <input type="file" id="file" name="file" accept=".csv,.xls,.xlsx" required>
+    </div>
+
+    <button type="submit" class="btn1">
+      <i class="fas fa-upload"></i> Upload File
+    </button>
+  </form>
+</div>
+
+<script>
+  const dropZone = document.getElementById('drop-zone');
+  const dropText = document.getElementById('drop-text');
+  const fileInfo = document.getElementById('file-info');
+  const fileInput = document.getElementById('file');
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('dragover');
+  });
+
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) {
+      handleFileSelection(e.dataTransfer.files[0]);
+    }
+  });
+
+  dropZone.addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+      handleFileSelection(fileInput.files[0]);
+    }
+  });
+
+  function handleFileSelection(file) {
+    const validExtensions = /\.(csv|xls|xlsx)$/i;
+    if (!validExtensions.test(file.name)) {
+      alert("Please select a valid file (CSV, XLS, XLSX).");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert("File size exceeds 10MB limit.");
+      return;
+    }
+
+    fileInfo.style.display = 'block';
+    fileInfo.innerHTML = `<i class="fas fa-file-alt"></i> ${file.name}`;
+
+    fileInput.files = [file];
+    dropText.style.display = 'none';
+    fileInfo.style.display = 'block';
+    fileInfo.innerHTML = `<i class="fas fa-file-alt"></i> ${file.name}`;
+    dropZone.style.borderColor = '#10b981';
+    dropZone.style.backgroundColor = 'rgba(16, 185, 129, 0.05)';
+  }
+</script>
+{% endblock %}
+ {% endcomment %}
+
+
+
+
+ {% block main %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<div class="card shadow-sm">
+  <div class="card-header text-white" style="background:#3b82f6;">
+    <h5 class="mb-0">Upload Your Data File</h5>
+  </div>
+
+  <form id="upload-form" action="/add_list/" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% if messages %}
+      <div class="p-3">
+        {% for message in messages %}
+          <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
+               role="alert" 
+               style="border-radius: 8px; font-weight: 500;">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="card-body row g-3">
+
+      <div class="col-md-12">
+        <label class="form-label" style="font-weight:bolder; color:gray;">List Name</label>
+        <input type="text" name="list_name" class="form-control" required>
+      </div>
+
+      <div class="col-md-12">
+        <label class="form-label" style="font-weight:bolder; color:gray;">Select File</label>
+        <div class="border rounded p-4 text-center" 
+             id="drop-zone" 
+             style="border: 2px dashed #b8bdbb; background-color: #f0fdf4; cursor: pointer;">
+          <i class="fas fa-cloud-upload-alt fa-2x text-success mb-2"></i>
+          <div id="drop-text">Drag & Drop your file here</div>
+          <div class="text-muted">or <span class="text-success fw-semibold">Browse Files</span></div>
+          <div id="file-info" class="mt-2 text-success fw-bold" style="display: none;"></div>
+        </div>
+        <input type="file" name="file" id="file" class="d-none" accept=".csv,.xls,.xlsx" required>
+        <small class="text-muted d-block mt-2">Supports: CSV, XLS, XLSX (Max 10MB)</small>
+      </div>
+
+    </div>
+
+    <div class="card-footer d-flex justify-content-between flex-wrap">
+      <a href="/userhome/" class="btn btn-secondary">← Cancel</a>
+      {% comment %} <button type="submit" class="btn btn-success">
+        <i class="fas fa-upload me-1"></i> Upload File
+      </button> {% endcomment %}
+
+      <button type="submit" 
+        class="btn" 
+        style="background-color: #37AFE1; color: white; min-width: 120px; height: 40px; padding: 8px 20px; font-size: 16px; border: none;">
+  <i class="fas fa-upload me-1"></i> Upload File
+</button>
+
+    </div>
+  </form>
+</div>
+
+<script>
+  const dropZone = document.getElementById('drop-zone');
+  const dropText = document.getElementById('drop-text');
+  const fileInfo = document.getElementById('file-info');
+  const fileInput = document.getElementById('file');
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('border-success');
+    dropZone.style.backgroundColor = 'rgba(52, 211, 153, 0.1)';
+  });
+
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('border-success');
+    dropZone.style.backgroundColor = '#f0fdf4';
+  });
+
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('border-success');
+    dropZone.style.backgroundColor = '#f0fdf4';
+    if (e.dataTransfer.files.length) {
+      handleFileSelection(e.dataTransfer.files[0]);
+    }
+  });
+
+  dropZone.addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+      handleFileSelection(fileInput.files[0]);
+    }
+  });
+
+  function handleFileSelection(file) {
+    const validExtensions = /\.(csv|xls|xlsx)$/i;
+    if (!validExtensions.test(file.name)) {
+      alert("Please select a valid file (CSV, XLS, XLSX).");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert("File size exceeds 10MB limit.");
+      return;
+    }
+
+    dropText.style.display = 'none';
+    fileInfo.style.display = 'block';
+    fileInfo.innerHTML = `<i class="fas fa-file-alt"></i> ${file.name}`;
+    dropZone.style.borderColor = '#10b981';
+    dropZone.style.backgroundColor = 'rgba(16, 185, 129, 0.05)';
+  }
+</script>
+{% endblock %}

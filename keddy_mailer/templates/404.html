@@ -1,0 +1,126 @@
+{% comment %} <!-- templates/404.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Page Not Found</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f8f9fa; display: flex; height: 100vh; justify-content: center; align-items: center; }
+    .card { padding: 40px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+  <div class="card text-center">
+    <h1 class="display-4 text-danger">404</h1>
+    <p class="lead">Oops! This page doesn't exist.</p>
+    <a class="btn btn-primary mt-3" onclick="history.back()">Go Back</a>
+  </div>
+</body>
+</html> {% endcomment %}
+
+
+
+
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 - Page Not Found</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .error-card {
+      background: white;
+      padding: 50px;
+      border-radius: 20px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 500px;
+      width: 90%;
+    }
+    .error-icon {
+      font-size: 70px;
+      color: #dc3545;
+    }
+    .btn-custom {
+      border-radius: 25px;
+      padding: 10px 25px;
+    }
+  </style>
+</head>
+<body>
+  <div class="error-card">
+    <div class="error-icon mb-3">🚫</div>
+    <h1 class="display-5 fw-bold text-danger">404 - Not Found</h1>
+    <p class="lead text-muted">Sorry, the page you're looking for doesn't exist or may have moved.</p>
+    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
+      <a href="/" class="btn btn-outline-secondary btn-custom">Go to Homepage</a>
+      <button onclick="history.back()" class="btn btn-primary btn-custom">Go Back</button>
+    </div>
+  </div>
+</body>
+</html> {% endcomment %}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Oops! Page Not Found</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .error-container {
+      background-color: white;
+      padding: 50px 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      text-align: center;
+      max-width: 500px;
+      width: 90%;
+    }
+    .error-container h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #1c1e21;
+    }
+    .error-container p {
+      color: #606770;
+      font-size: 16px;
+      margin-bottom: 25px;
+    }
+    .btn-rounded {
+      border-radius: 25px;
+      padding: 8px 22px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="error-container">
+    <h1>Oops! Page Not Found</h1>
+    <p>We're sorry, but the page you were looking for doesn't exist. It might have been moved or deleted.</p>
+    <button onclick="history.back()" class="btn btn-primary btn-rounded">Go Back</button>
+  </div>
+</body>
+</html>

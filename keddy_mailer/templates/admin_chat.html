@@ -1,0 +1,309 @@
+{% extends "adminhome.html" %}
+
+{% block summary_content %}{% endblock %}
+
+{% block topbar1 %} {% endblock %}
+
+{% block outermain %}{% endblock %}
+
+{% block main %}{% endblock %}
+
+
+{% block top_campaigns %}
+
+{% load static %}
+
+  <style>
+    {% comment %} body { background-color: #f2f4f8; } {% endcomment %}
+
+    .chat-wrapper {
+      height: 90vh;
+      display: flex;
+      flex-direction: row;
+    }
+
+    .chat-sidebar {
+      width: 30%;
+      border-right: 1px solid #dee2e6;
+      background-color: #fff;
+      overflow-y: auto;
+    }
+
+    .chat-user {
+      cursor: pointer;
+      padding: 12px 16px;
+      border-bottom: 1px solid #f1f1f1;
+    }
+
+    .chat-user:hover, .chat-user.active {
+      background-color: #e9f5ff;
+    }
+
+    .chat-box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: #fff;
+    }
+
+    .chat-header {
+      padding: 15px;
+      border-bottom: 1px solid #ddd;
+      background-color: #f8f9fa;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+    }
+
+    .message {
+    display: inline-block;
+    clear: both;
+    max-width: 80%;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    border-radius: 15px;
+    word-wrap: break-word;
+    font-size: 15px;
+    position: relative;
+    line-height: 1.4;
+    }
+
+    .message.sent {
+  background-color: #d0e7ff;
+  float: right;
+  border-bottom-right-radius: 0;
+    }
+
+    .message.received {
+  background-color: #e4e6eb;
+  color: #000;
+  float: left;
+  border-bottom-left-radius: 0;
+    }
+
+.message small {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #555;
+  text-align: right;
+}
+
+    .chat-input {
+      border-top: 1px solid #ddd;
+      padding: 10px 15px;
+      display: flex;
+      gap: 10px;
+      background: #f9f9f9;
+    }
+
+    .default-msg {
+      margin-top: 100px;
+      text-align: center;
+      color: #999;
+      font-size: 18px;
+    }
+    
+
+    @media (max-width: 768px) {
+      .chat-wrapper {
+        flex-direction: column;
+      }
+      .chat-sidebar {
+        width: 100%;
+        height: 200px;
+      }
+    }
+  </style>
+
+
+<div class="container-fluid p-0 chat-wrapper">
+  <!-- Sidebar -->
+  <div class="chat-sidebar">
+    <h5 class="p-3 mb-0 border-bottom bg-light">Chats</h5>
+    <div id="userList">
+      {% for user in users %}
+        <div class="chat-user" data-email="{{ user.email }}">{{ user.name }}</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Chat Box -->
+  <div class="chat-box">
+    <div class="chat-header">
+      <strong id="chatWith">Welcome </strong>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="default-msg" id="defaultMessage">Select a user to start chatting</div>
+    </div>
+
+    <div class="chat-input">
+      <input type="text" id="messageInput" class="form-control" placeholder="Type a message..." disabled>
+      <button class="btn btn-primary" id="sendBtn" disabled>Send</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  let selectedUser = null;
+
+  $('.chat-user').on('click', function () {
+    $('.chat-user').removeClass('active');
+    $(this).addClass('active');
+
+    selectedUser = $(this).data('email');
+    const userName = $(this).text();
+    $('#chatWith').text(`Chatting with ${userName}`);
+    $('#defaultMessage').hide();
+    $('#messageInput, #sendBtn').prop('disabled', false);
+    $('#chatMessages').html('');
+    loadMessages(selectedUser);
+  });
+
+  function loadMessages(email) {
+    $.get(`/admin/fetch_messages/?user_email=${email}`, function (data) {
+      $('#chatMessages').html('');
+      if (data.status === 'success' && data.messages.length) {
+        data.messages.forEach(msg => {
+          const cls = msg.sender === 'Admin' ? 'sent' : 'received';
+          $('#chatMessages').append(`<div class="message ${cls}">${msg.message} </br><small >${msg.sender}, ${msg.time}</small></div>`);
+        });
+      } else {
+        $('#chatMessages').html('<div class="default-msg">No messages yet.</div>');
+      }
+      scrollToBottom();
+    });
+  }
+
+  $('#sendBtn').on('click', function () {
+    const msg = $('#messageInput').val().trim();
+    if (!msg || !selectedUser) return;
+
+    $.ajax({
+      type: 'POST',
+      url: '/admin/send_message/',
+      headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+      contentType: 'application/json',
+      data: JSON.stringify({
+        receiver_email: selectedUser,
+        message: msg
+      }),
+      success: function (data) {
+        if (data.status === 'success') {
+          $('#messageInput').val('');
+          loadMessages(selectedUser);
+        }
+      }
+    });
+  });
+
+  $('#messageInput').keypress(function (e) {
+    if (e.which === 13) $('#sendBtn').click();
+  });
+
+  function scrollToBottom() {
+    $('#chatMessages').scrollTop($('#chatMessages')[0].scrollHeight);
+  }
+
+  setInterval(() => {
+    if (selectedUser) loadMessages(selectedUser);
+  }, 5000);
+</script>
+
+
+{% endblock %}
+
+
+
+
+
+
+
+{% comment %} <!-- templates/admin_chat.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Chat Panel</title>
+    <style>
+        body { font-family: Arial; display: flex; }
+        .user-list { width: 25%; border-right: 1px solid #ccc; padding: 10px; }
+        .chat-box { flex: 1; padding: 10px; display: flex; flex-direction: column; }
+        .messages { flex: 1; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+        .message { margin: 5px 0; }
+        .admin-msg { text-align: right; font-weight: bold; }
+        .user-msg { text-align: left; color: #333; }
+    </style>
+</head>
+<body>
+    <div class="user-list">
+        <h3>Users</h3>
+        <ul id="userList">
+            {% for user in users %}
+                <li onclick="selectUser('{{ user.email }}')">{{ user.email }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="chat-box">
+        <h3>Chat with: <span id="currentUser"></span></h3>
+        <div class="messages" id="messages"></div>
+        <div>
+            <input type="text" id="messageInput" placeholder="Type your message..." style="width: 80%;" />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedUser = null;
+
+        function selectUser(email) {
+            selectedUser = email;
+            document.getElementById("currentUser").innerText = email;
+            fetchMessages();
+        }
+
+        function fetchMessages() {
+            if (!selectedUser) return;
+            fetch(`/admin/fetch_messages/?user_email=${selectedUser}`)
+                .then(res => res.json())
+                .then(data => {
+                    const box = document.getElementById("messages");
+                    box.innerHTML = '';
+                    data.messages.forEach(msg => {
+                        const div = document.createElement("div");
+                        div.className = "message " + (msg.sender === "admin@example.com" ? "admin-msg" : "user-msg");
+                        div.innerText = msg.sender + ": " + msg.message + " (" + msg.time + ")";
+                        box.appendChild(div);
+                    });
+                });
+        }
+
+        function sendMessage() {
+            const msg = document.getElementById("messageInput").value;
+            if (!msg || !selectedUser) return;
+            fetch("/admin/send_message/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    receiver_email: selectedUser,
+                    message: msg
+                })
+            })
+            .then(res => res.json())
+            .then(() => {
+                document.getElementById("messageInput").value = "";
+                fetchMessages();
+            });
+        }
+
+        setInterval(fetchMessages, 3000); // auto-refresh
+    </script>
+</body>
+</html> {% endcomment %}
+
+
+

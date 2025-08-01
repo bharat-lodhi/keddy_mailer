@@ -1,0 +1,48 @@
+{% extends "adminhome.html" %}
+
+{% block summary_content %}{% endblock %}
+
+
+
+{% comment %} {% block outermain %}{% endblock %} {% endcomment %}
+
+{% block top_campaigns %}{% endblock %}
+
+{% block main %}
+
+{% comment %} <div class="container"> {% endcomment %}
+  <div class="card shadow">
+    <div class="card-header bg-success text-white">
+      <h4 class="mb-0">Edit User</h4>
+    </div>
+    <div class="card-body">
+      <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="name" class="form-label">Full Name</label>
+          <input type="text" class="form-control" name="name" id="name" value="{{ user.name }}" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">Email Address</label>
+          <input type="email" class="form-control" name="email" id="email" value="{{ user.email }}" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">password</label>
+          <input type="text" class="form-control" name="password" id="email" value="{{ user.password }}" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="company" class="form-label">Company</label>
+          <input type="text" class="form-control" name="company" id="company" value="{{ user.company }}" required>
+        </div>
+
+        <button type="submit" class="btn btn-success">Update</button>
+        <a href="/user_list/" class="btn btn-secondary">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

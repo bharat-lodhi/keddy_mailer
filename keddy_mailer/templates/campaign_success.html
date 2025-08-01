@@ -1,0 +1,246 @@
+{% extends "userhome.html" %}
+
+{% load static %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}
+{% endblock %}
+
+{% block top_campaigns %} {% endblock %}
+
+
+{% block main %}
+<style>
+  .success-container {
+    max-width: 1100px;
+    text-align: center;
+    background: white;
+    padding: 40px 30px;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  .checkmark-circle {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 24px;
+  }
+
+  .circle {
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+    stroke-width: 6;
+    stroke: #10b981;
+    fill: none;
+    animation: dashCircle 0.6s ease-out forwards;
+  }
+
+  .check {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    stroke-width: 6;
+    stroke: #10b981;
+    fill: none;
+    animation: dashCheck 0.4s 0.6s ease forwards;
+  }
+
+  .success-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+    opacity: 0;
+    animation: fadeIn 0.6s ease 1s forwards;
+  }
+
+  .success-text {
+    font-size: 16px;
+    color: #6b7280;
+    margin-bottom: 30px;
+    opacity: 0;
+    animation: fadeIn 0.6s ease 1.2s forwards;
+  }
+
+  .btn-success-link {
+    background: linear-gradient(90deg, #16a34a, #10b981);
+    color: white;
+    padding: 12px 26px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    font-size: 15px;
+    text-decoration: none;
+    display: inline-block;
+    transition: 0.3s;
+    opacity: 0;
+    animation: fadeIn 0.6s ease 1.4s forwards;
+  }
+
+  .btn-success-link:hover {
+    opacity: 0.9;
+  }
+
+  @keyframes dashCircle {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes dashCheck {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
+  }
+</style>
+
+<div class="success-container">
+
+  <svg class="checkmark-circle" viewBox="0 0 52 52">
+    <circle class="circle" cx="26" cy="26" r="23" />
+    <path class="check" d="M14 27l7 7 17-17" />
+  </svg>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="success-title">{{ message }}</div>
+    {% endfor %}
+  {% else %}
+    <div class="success-title">Campaign Sent Successfully!</div>
+  {% endif %}
+
+  {% comment %} {% if messages %}
+  {% for message in messages %}
+    <div class="success-title 
+                {% if message.tags == 'warning' %}text-warning
+                {% elif message.tags == 'success' %}
+                {% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="success-title">Campaign Sent Successfully!</div>
+{% endif %} {% endcomment %}
+
+
+  <div class="success-text">Your campaign has been processed and will reach the selected recipients accordingly.</div>
+  <a href="/create_campaign/" class="btn-success-link">Create Another Campaign</a>
+</div>
+{% endblock %}
+
+
+
+
+{% comment %} 
+{% block main %}
+<style>
+  .success-wrapper {
+    max-width: 1100px;
+    background: white;
+    border-radius: 16px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.05);
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  .success-checkmark {
+    font-size: 64px;
+    color: #10b981;
+    animation: popIn 0.4s ease forwards;
+    opacity: 0;
+    transform: scale(0.6);
+    margin-bottom: 20px;
+  }
+
+  .success-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+    animation: fadeIn 0.6s ease 0.3s forwards;
+    opacity: 0;
+  }
+
+  .success-message {
+    color: #6b7280;
+    font-size: 16px;
+    margin-bottom: 30px;
+    animation: fadeIn 0.6s ease 0.5s forwards;
+    opacity: 0;
+  }
+
+  .success-wrapper .btn-primary {
+    background: linear-gradient(90deg, #16a34a, #10b981);
+    border: none;
+    font-weight: 600;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: 0.3s;
+  }
+
+  .success-wrapper .btn-primary:hover {
+    opacity: 0.9;
+  }
+
+  /* Animations */
+  @keyframes popIn {
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<div class="success-wrapper">
+  <div class="success-checkmark">
+    <i class="bi bi-check-circle-fill"></i>
+  </div>
+  <div class="success-title">Campaign Sent Successfully!</div>
+  <div class="success-message">
+    Your emails have been delivered to the selected list of recipients.
+  </div>
+  <a href="/create_campaign/" class="btn btn-primary">Create Another Campaign</a>
+</div>
+
+{% endblock %} {% endcomment %}
