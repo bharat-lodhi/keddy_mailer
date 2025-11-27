@@ -1,0 +1,281 @@
+<!-- followups/templates/followups/dashboard.html -->
+{% extends "userhome.html" %}
+
+{% block topbar1 %}{% endblock %}
+
+{% block outermain %}{% endblock %}
+
+{% block summary_content %}{% endblock %}
+
+{% block top_campaigns %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">📧 Follow-up Campaigns</h1>
+        <a href="{% url 'campaign_list' %}" class="btn btn-outline-primary">
+            ← Back to Campaigns
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Active Follow-ups</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ active_campaigns }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-play-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Completed</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ completed_campaigns }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Follow-ups Sent</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_followups_sent }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-paper-plane fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Credits Left</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ credits_left }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-coins fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campaigns List -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Your Follow-up Campaigns</h6>
+            <button class="btn btn-primary btn-sm" onclick="loadCampaignsForFollowup()">
+                + Create New Follow-up
+            </button>
+        </div>
+        <div class="card-body">
+            {% if followup_campaigns %}
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Original Campaign</th>
+                            <th>Status</th>
+                            <th>Progress</th>
+                            <th>Follow-ups Sent</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for campaign in followup_campaigns %}
+                        <tr>
+                            <td>
+                                <strong>{{ campaign.name }}</strong>
+                            </td>
+                            <td>{{ campaign.original_campaign.name }}</td>
+                            <td>
+                                {% if campaign.status == 'active' %}
+                                <span class="badge badge-success">Active</span>
+                                {% elif campaign.status == 'paused' %}
+                                <span class="badge badge-warning">Paused</span>
+                                {% elif campaign.status == 'completed' %}
+                                <span class="badge badge-info">Completed</span>
+                                {% else %}
+                                <span class="badge badge-secondary">Draft</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar {% if campaign.status == 'active' %}bg-success{% elif campaign.status == 'completed' %}bg-info{% else %}bg-secondary{% endif %}" 
+                                         role="progressbar" 
+                                         style="width: {{ campaign.progress_percentage }}%;" 
+                                         aria-valuenow="{{ campaign.progress_percentage }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                        {{ campaign.current_sequence }}/{{ campaign.max_followups }}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ campaign.total_emails_sent }}</td>
+                            <td>{{ campaign.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                <a href="campaign/{{ campaign.id }}/analytics/" 
+                                   class="btn btn-info btn-sm">View</a>
+                                {% if campaign.status == 'draft' %}
+                                {% comment %} <a href="{% url 'followups:start_followup_campaign' campaign.id %}"  {% endcomment %}
+                                <a href="{% url 'followups:start_followup_campaign' campaign.id %}" 
+                                   class="btn btn-success btn-sm">Start</a>
+                                {% elif campaign.status == 'active' %}
+                                <a href="{% url 'followups:stop_followup_campaign' campaign.id %}" 
+                                   class="btn btn-warning btn-sm">Pause</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-inbox fa-3x text-gray-300 mb-3"></i>
+                <h4 class="text-gray-500">No Follow-up Campaigns Yet</h4>
+                <p class="text-gray-500">Create your first follow-up campaign to engage with non-responsive contacts.</p>
+                <button class="btn btn-primary" onclick="loadCampaignsForFollowup()">
+                    Create Your First Follow-up
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Campaign Selection Modal -->
+<div class="modal fade" id="campaignSelectModal" tabindex="-1" role="dialog" aria-labelledby="campaignSelectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="campaignSelectModalLabel">Select Campaign for Follow-up</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="campaignsList">
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <p>Loading your campaigns...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+function loadCampaignsForFollowup() {
+    $('#campaignSelectModal').modal('show');
+    
+    // DEBUG: Check if URL is correct
+    console.log("AJAX URL:", "{% url 'followups:get_campaigns_for_followup' %}");
+    
+    $.ajax({
+        url: "{% url 'followups:get_campaigns_for_followup' %}",
+        type: 'GET',
+        success: function(response) {
+            console.log("AJAX Success:", response);
+            let html = '';
+            
+            if (response.campaigns && response.campaigns.length > 0) {
+                response.campaigns.forEach(campaign => {
+                    // FIXED: Use proper URL construction
+                    const createUrl = "{% url 'followups:create_followup_campaign' 0 %}".replace('0', campaign.id);
+                    
+                    html += `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5 class="card-title">${campaign.name}</h5>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            Sent: ${campaign.sent_count} emails | 
+                                            Non-openers: ${campaign.non_openers} | 
+                                            Non-clickers: ${campaign.non_clickers} |
+                                            Created: ${campaign.created_at}
+                                        </small>
+                                    </p>
+                                </div>
+                                <div class="col-md-4 text-right">
+                                    <a href="${createUrl}" class="btn btn-primary">
+                                        Create Follow-up
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+            } else {
+                html = `
+                <div class="text-center py-4">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No Campaigns Available</h5>
+                    <p class="text-muted">You need to have sent campaigns to create follow-ups.</p>
+                    <a href="{% url 'campaign_list' %}" class="btn btn-primary">
+                        Go to Campaigns
+                    </a>
+                </div>`;
+            }
+            $('#campaignsList').html(html);
+        },
+        error: function(xhr, status, error) {
+            console.error("AJAX Error:", error);
+            $('#campaignsList').html(`
+                <div class="alert alert-danger">
+                    <h6>Error Loading Campaigns</h6>
+                    <p>Please try again. If the problem persists, contact support.</p>
+                    <button class="btn btn-warning btn-sm" onclick="loadCampaignsForFollowup()">
+                        Retry
+                    </button>
+                </div>
+            `);
+        }
+    });
+}
+
+// Alternative simple function for testing
+function testCreateFollowup() {
+    // Directly redirect to create page with a test campaign ID
+    // Replace '1' with an actual campaign ID from your database
+    window.location.href = "{% url 'followups:create_followup_campaign' 123 %}".replace('123', '1');
+}
+</script>
+
+{% endblock %}

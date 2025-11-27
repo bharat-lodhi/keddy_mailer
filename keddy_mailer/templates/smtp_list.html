@@ -11,63 +11,726 @@
 {% block main %}{% endblock %}
 {% block outermain %} {% endblock %}
 
- 
+{% block topbar1 %}{% endblock %}
 
-{% comment %} {% block main %}
 
-<div class="container mt-4">
-  <h2 class="mb-4">📬 SMTP Servers</h2>
-  <div class="table-responsive">
-    <table class="table table-bordered table-striped shadow-sm rounded">
-      <thead class="table-success">
-        <tr>
-          <th>#</th>
-          <th>Server Name</th>
-          <th>Username</th>
-          <th>From Email</th>
-          <th>Host</th>
-          <th>Port</th>
-          <th>Status</th>
-          <th>Created</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for server in smtp_servers %}
+{% block top_campaigns %}
+
+<style>
+  .server-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    {% comment %} border: 1px solid #8FABD4; {% endcomment %}
+    overflow: hidden;
+  }
+  
+  .server-header {
+    background: linear-gradient(135deg, #8FABD4 0%, #4A70A9 100%);
+    padding: 6px 20px;
+    border-bottom: 1px solid #8FABD4;
+  }
+  
+  .server-body {
+    padding: 0;
+  }
+  
+  .table {
+    margin-bottom: 0;
+    border-color: #8FABD4;
+  }
+  
+  .table th {
+    background-color: #EFECE3;
+    color: #000000;
+    font-weight: 600;
+    border-color: #8FABD4;
+    padding: 12px 16px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  
+  .table td {
+    border-color: #8FABD4;
+    padding: 12px 16px;
+    font-size: 14px;
+    vertical-align: middle;
+    color: #000000;
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: #EFECE3;
+  }
+  
+  .btn-light {
+    background: #ffffff;
+    border: 1px solid #8FABD4;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 500;
+    color: #000000;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    font-size: 14px;
+  }
+  
+  .btn-light:hover {
+    background: #8FABD4;
+    border-color: #4A70A9;
+    transform: translateY(-1px);
+    color: #ffffff;
+    text-decoration: none;
+  }
+  
+  .btn-edit {
+    background: linear-gradient(135deg, #8FABD4 0%, #4A70A9 100%);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    text-decoration: none;
+    box-shadow: 0 2px 4px rgba(143, 171, 212, 0.3);
+  }
+  
+  .btn-edit:hover {
+    background: linear-gradient(135deg, #4A70A9 0%, #3a5c8f 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(143, 171, 212, 0.4);
+    color: white;
+    text-decoration: none;
+  }
+  
+  .btn-delete {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    text-decoration: none;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+  }
+  
+  .btn-delete:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.4);
+    color: white;
+    text-decoration: none;
+  }
+  
+  .badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .badge.bg-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  }
+  
+  .badge.bg-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  }
+  
+  .alert {
+    border-radius: 8px;
+    border: none;
+    padding: 12px 16px;
+    font-weight: 500;
+    margin-bottom: 20px;
+  }
+  
+  .alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border-left: 4px solid #10b981;
+  }
+  
+  .alert-danger {
+    background: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+  }
+  
+  .text-muted {
+    color: #8FABD4 !important;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+  
+  /* Custom table styling */
+  .table-light {
+    background-color: #EFECE3 !important;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .server-header {
+      padding: 14px 20px;
+    }
+    
+    .server-header h5 {
+      font-size: 18px;
+    }
+    
+    .table-responsive {
+      border: 1px solid #8FABD4;
+      border-radius: 8px;
+    }
+    
+    .table th,
+    .table td {
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+    
+    .btn-light {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .server-header {
+      padding: 12px 16px;
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    
+    .server-header .d-flex {
+      width: 100%;
+      justify-content: space-between;
+    }
+    
+    .table th,
+    .table td {
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .btn-edit,
+    .btn-delete {
+      width: 32px;
+      height: 32px;
+    }
+  }
+</style>
+
+{% if messages %}
+<div>
+  {% for message in messages %}
+    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" role="alert">
+      <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %} me-2"></i>
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="server-card">
+  <div class="server-header text-white d-flex justify-content-between align-items-center">
+    <h5 class="mb-0"><i class="bi bi-server me-2"></i>SMTP Server List</h5>
+    <a href="/add_server/" class="btn btn-light">
+      <i class="bi bi-plus-circle me-1"></i> Add Server
+    </a>
+  </div>
+  
+  <div class="server-body">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Server Name</th>
+            <th>Username</th>
+            <th>Total Sent</th>
+            <th>Hr Rate</th>
+            <th>1 Hr Sent</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in smtp_data %}
           <tr>
             <td>{{ forloop.counter }}</td>
-            <td>{{ server.name }}</td>
-            <td>{{ server.username }}</td>
-            <td>{{ server.from_email }}</td>
-            <td>{{ server.host }}</td>
-            <td>{{ server.port }}</td>
+            <td>{{ item.smtp.name }}</td>
+            <td>{{ item.smtp.username }}</td>
+            <td>{{ item.total_sent }}</td>
+            <td>{{ item.smtp.emails_per_hour }}</td>
+            <td>{{ item.last_hour_sent }}</td>
             <td>
-              {% if server.is_active %}
-                <span class="badge bg-success">✅ Verified</span>
+              {% if item.smtp.is_active %}
+                <span class="badge bg-success">
+                  <i class="bi bi-check-circle me-1"></i> Verified
+                </span>
               {% else %}
-                <span class="badge bg-danger">❌ Not Verified</span>
+                <span class="badge bg-danger">
+                  <i class="bi bi-x-circle me-1"></i> Not Verified
+                </span>
               {% endif %}
             </td>
-            <td>{{ server.created_at|date:"Y-m-d H:i" }}</td>
             <td>
-              <a href="/edit_smtp/{{ server.id }}/" class="btn btn-sm btn-outline-primary">✏️ Edit</a>
-              <a href="/delete_smtp/{{ server.id }}/" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this SMTP server?');">🗑️ Delete</a>
+              <div class="action-buttons">
+                <a href="/edit_smtp_server/{{ item.smtp.id }}" 
+                   class="btn-edit" 
+                   title="Edit Server">
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+                <a href="/delete_smtp/{{ item.smtp.id }}" 
+                   class="btn-delete" 
+                   title="Delete Server"
+                   onclick="return confirm('Are you sure you want to delete this server?')">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
             </td>
           </tr>
-        {% empty %}
+          {% empty %}
           <tr>
-            <td colspan="9" class="text-center text-muted">No SMTP servers found.</td>
+            <td colspan="8" class="text-center text-muted py-4">
+              <i class="bi bi-inbox display-4 d-block mb-2"></i>
+              No SMTP servers found.
+              <br>
+              <small class="text-muted">Get started by adding your first SMTP server.</small>
+            </td>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
+
+<script>
+  // Add hover effects and confirmations
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add loading state to delete buttons
+    const deleteButtons = document.querySelectorAll('.btn-delete');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        if (!confirm('Are you sure you want to delete this SMTP server? This action cannot be undone.')) {
+          e.preventDefault();
+        }
+      });
+    });
+    
+    // Add smooth hover effects
+    const tableRows = document.querySelectorAll('tbody tr');
+    tableRows.forEach(row => {
+      row.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-1px)';
+        this.style.transition = 'all 0.2s ease';
+      });
+      row.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+      });
+    });
+  });
+</script>
+
+{% endblock %}
+
+
+
+
+{% comment %} {% extends "userhome.html" %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}{% endblock %}
+
+{% block main %}{% endblock %}
+{% block outermain %} {% endblock %}
+
+{% block top_campaigns %}
+
+<style>
+  .server-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+  }
+  
+  .server-header {
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+    padding: 6px 20px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .server-body {
+    padding: 0;
+  }
+  
+  .table {
+    margin-bottom: 0;
+    border-color: #e2e8f0;
+  }
+  
+  .table th {
+    background-color: #f8fafc;
+    color: #1e293b;
+    font-weight: 600;
+    border-color: #e2e8f0;
+    padding: 12px 16px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  
+  .table td {
+    border-color: #e2e8f0;
+    padding: 12px 16px;
+    font-size: 14px;
+    vertical-align: middle;
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: #f8fafc;
+  }
+  
+  .btn-light {
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 500;
+    color: #374151;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    font-size: 14px;
+  }
+  
+  .btn-light:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+    transform: translateY(-1px);
+    color: #374151;
+    text-decoration: none;
+  }
+  
+  .btn-edit {
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    text-decoration: none;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  }
+  
+  .btn-edit:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+    color: white;
+    text-decoration: none;
+  }
+  
+  .btn-delete {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    text-decoration: none;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+  }
+  
+  .btn-delete:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.4);
+    color: white;
+    text-decoration: none;
+  }
+  
+  .badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .badge.bg-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  }
+  
+  .badge.bg-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  }
+  
+  .alert {
+    border-radius: 8px;
+    border: none;
+    padding: 12px 16px;
+    font-weight: 500;
+    margin-bottom: 20px;
+  }
+  
+  .alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border-left: 4px solid #10b981;
+  }
+  
+  .alert-danger {
+    background: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+  }
+  
+  .text-muted {
+    color: #6b7280 !important;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .server-header {
+      padding: 14px 20px;
+    }
+    
+    .server-header h5 {
+      font-size: 18px;
+    }
+    
+    .table-responsive {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+    }
+    
+    .table th,
+    .table td {
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+    
+    .btn-light {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .server-header {
+      padding: 12px 16px;
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    
+    .server-header .d-flex {
+      width: 100%;
+      justify-content: space-between;
+    }
+    
+    .table th,
+    .table td {
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .btn-edit,
+    .btn-delete {
+      width: 32px;
+      height: 32px;
+    }
+  }
+</style>
+
+{% if messages %}
+<div>
+  {% for message in messages %}
+    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" role="alert">
+      <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %} me-2"></i>
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="server-card">
+  <div class="server-header text-white d-flex justify-content-between align-items-center">
+    <h5 class="mb-0"><i class="bi bi-server me-2"></i>SMTP Server List</h5>
+    <a href="/add_server/" class="btn btn-light">
+      <i class="bi bi-plus-circle me-1"></i> Add Server
+    </a>
+  </div>
+  
+  <div class="server-body">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Server Name</th>
+            <th>Username</th>
+            <th>Total Sent</th>
+            <th>Hr Rate</th>
+            <th>1 Hr Sent</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in smtp_data %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ item.smtp.name }}</td>
+            <td>{{ item.smtp.username }}</td>
+            <td>{{ item.total_sent }}</td>
+            <td>{{ item.smtp.emails_per_hour }}</td>
+            <td>{{ item.last_hour_sent }}</td>
+            <td>
+              {% if item.smtp.is_active %}
+                <span class="badge bg-success">
+                  <i class="bi bi-check-circle me-1"></i> Verified
+                </span>
+              {% else %}
+                <span class="badge bg-danger">
+                  <i class="bi bi-x-circle me-1"></i> Not Verified
+                </span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="action-buttons">
+                <a href="/edit_smtp_server/{{ item.smtp.id }}" 
+                   class="btn-edit" 
+                   title="Edit Server">
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+                <a href="/delete_smtp/{{ item.smtp.id }}" 
+                   class="btn-delete" 
+                   title="Delete Server"
+                   onclick="return confirm('Are you sure you want to delete this server?')">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="text-center text-muted py-4">
+              <i class="bi bi-inbox display-4 d-block mb-2"></i>
+              No SMTP servers found.
+              <br>
+              <small class="text-muted">Get started by adding your first SMTP server.</small>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Add hover effects and confirmations
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add loading state to delete buttons
+    const deleteButtons = document.querySelectorAll('.btn-delete');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        if (!confirm('Are you sure you want to delete this SMTP server? This action cannot be undone.')) {
+          e.preventDefault();
+        }
+      });
+    });
+    
+    // Add smooth hover effects
+    const tableRows = document.querySelectorAll('tbody tr');
+    tableRows.forEach(row => {
+      row.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-1px)';
+        this.style.transition = 'all 0.2s ease';
+      });
+      row.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+      });
+    });
+  });
+</script>
 
 {% endblock %} {% endcomment %}
 
 
 
+
+
+
+
+
+{% comment %} {% extends "userhome.html" %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}{% endblock %}
+
+{% block main %}{% endblock %}
+{% block outermain %} {% endblock %}
 
 {% block top_campaigns %}
 
@@ -101,8 +764,6 @@
               <th>#</th>
               <th>Server Name</th>
               <th>Username</th>
-              {% comment %} <th>Host</th>
-              <th>Port</th> {% endcomment %}
               <th>Total Sent</th>
 
              <th>Hr Rate</th>
@@ -120,9 +781,7 @@
               <td>{{ forloop.counter }}</td>
               <td>{{ item.smtp.name }}</td>
               <td>{{ item.smtp.username }}</td>
-              {% comment %} <td>{{ server.from_email }}</td> {% endcomment %}
-              {% comment %} <td>{{ item.smtp.host }}</td>
-              <td>{{ item.smtp.port }}</td> {% endcomment %}
+              
               <td>{{ item.total_sent }}</td>
 
             <td>{{ item.smtp.emails_per_hour }}</td>
@@ -135,17 +794,7 @@
                   <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Not Verified</span>
                 {% endif %}
               </td>
-              {% comment %} <td>{{ server.created_at|date:"M d, Y H:i" }}</td> {% endcomment %}
-              {% comment %} <td style="display:flex">
-                <a href="/edit_smtp/{{ server.id }}" class="btn btn-sm btn-outline-primary" title="Edit">
-                  <i class="bi bi-pencil-square"></i>
-                </a>
-                <a href="/delete_smtp/{{ server.id }}" class="btn btn-sm btn-outline-danger" title="Delete"
-                   onclick="return confirm('Are you sure you want to delete this server?')">
-                  <i class="bi bi-trash"></i>
-                </a>
-              </td>
-            </tr> {% endcomment %}
+              
 
 <td style="display: flex; gap: 6px;">
   <a href="/edit_smtp_server/{{ item.smtp.id }}" 
@@ -175,7 +824,7 @@
     </div>
   </div>
 
-{% endblock %}
+{% endblock %} {% endcomment %}
 
 
 

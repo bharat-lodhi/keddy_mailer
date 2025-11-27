@@ -8,7 +8,7 @@
 
 {% block outermain %}{% endblock %}
 {% block main %}{% endblock %}
-
+{% block topbar1 %}{% endblock %}
 
 {% block top_campaigns %}
 
@@ -24,7 +24,7 @@
         </div>
         <div class="col-md-6">
           <label class="form-label">Email</label>
-          <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+          <input type="email" name="email" class="form-control" value="{{ user.email }}" readonly required>
         </div>
         <div class="col-md-6">
           <label class="form-label">Phone</label>

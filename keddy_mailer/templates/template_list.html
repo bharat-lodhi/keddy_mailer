@@ -13,6 +13,7 @@
 
 {% block main %}{% endblock %}
 {% block outermain %}{% endblock %}
+{% block topbar1 %}{% endblock %}
 
 {% block top_campaigns %} 
 {% comment %} <div class="container mt-4"> {% endcomment %}
@@ -56,7 +57,8 @@
               <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ temp.template_name }}</td>
-                <td>{{ temp.content|truncatechars:60 }}</td>
+                {% comment %} <td>{{ temp.content|truncatechars:60 }}</td> {% endcomment %}
+                <td>{{ temp.content|striptags|truncatechars:60 }}</td>
                 <td>{{ temp.uploaded_at|date:"Y-m-d H:i" }}</td>
 
                 {% comment %} <td>

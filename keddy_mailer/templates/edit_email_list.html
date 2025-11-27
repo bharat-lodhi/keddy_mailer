@@ -11,6 +11,177 @@
 {% block top_campaigns %} {% endblock %}
 
 {% block main %}
+<style>
+  .edit-list-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #8FABD4;
+    overflow: hidden;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .card-header {
+    background: linear-gradient(135deg, #8FABD4 0%, #4A70A9 100%);
+    padding: 16px 24px;
+    border-bottom: 1px solid #8FABD4;
+  }
+  
+  .card-body {
+    padding: 24px;
+  }
+  
+  .form-label {
+    font-weight: 600;
+    color: #000000;
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  
+  .form-control {
+    border: 1px solid #8FABD4;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background-color: #ffffff;
+    color: #000000;
+  }
+  
+  .form-control:focus {
+    border-color: #4A70A9;
+    box-shadow: 0 0 0 3px rgba(74, 112, 169, 0.1);
+    outline: none;
+  }
+  
+  .btn-secondary {
+    background: #8FABD4;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    color: #000000;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  
+  .btn-secondary:hover {
+    background: #4A70A9;
+    transform: translateY(-1px);
+    color: #ffffff;
+    text-decoration: none;
+  }
+  
+  .btn-success {
+    background: linear-gradient(135deg, #8FABD4 0%, #4A70A9 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-weight: 500;
+    color: #ffffff;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(143, 171, 212, 0.3);
+  }
+  
+  .btn-success:hover {
+    background: linear-gradient(135deg, #4A70A9 0%, #3a5c8f 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(143, 171, 212, 0.4);
+    color: #ffffff;
+  }
+  
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  
+  @media (max-width: 768px) {
+    .edit-list-card {
+      margin: 0 16px;
+    }
+    
+    .card-body {
+      padding: 20px;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .action-buttons a, 
+    .action-buttons button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .card-body {
+      padding: 16px;
+    }
+    
+    .card-header {
+      padding: 14px 20px;
+    }
+    
+    .card-header h5 {
+      font-size: 18px;
+    }
+  }
+</style>
+
+<div class="container py-4">
+  <div class="edit-list-card">
+    <div class="card-header text-white">
+      <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Edit List Name</h5>
+    </div>
+    <div class="card-body">
+      <form method="POST">
+        {% csrf_token %}
+        <div class="mb-4">
+          <label for="list_name" class="form-label">New List Name</label>
+          <input type="text" name="list_name" id="list_name" class="form-control" value="{{ email_obj.list_name }}" required placeholder="Enter new list name">
+        </div>
+        <div class="action-buttons">
+          <a href="/email_lists/" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Cancel
+          </a>
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-check-circle me-1"></i> Update List
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+
+
+{% comment %} {% extends "userhome.html" %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}
+{% endblock %}
+{% block top_campaigns %} {% endblock %}
+
+{% block main %}
 <div class="container" style="max-width: 600px;">
   <div class="card shadow">
     <div class="card-header text-white" style="background-color: #3B82F6;">
@@ -31,4 +202,4 @@
     </div>
   </div>
 </div>
-{% endblock %}
+{% endblock %} {% endcomment %}

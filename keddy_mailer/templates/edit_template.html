@@ -9,6 +9,254 @@
 {% block other %}
 {% endblock %}
 {% block top_campaigns %} {% endblock %}
+{% comment %} {% block outermain %}{% endblock %} {% endcomment %}
+{% block topbar1 %}{% endblock %}
+
+{% block main %}
+
+<script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
+
+<style>
+  .edit-template-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #8FABD4;
+    overflow: hidden;
+    max-width: 900px;
+    margin: 20px auto;
+  }
+  
+  .card-header {
+    background: linear-gradient(135deg, #8FABD4 0%, #4A70A9 100%);
+    padding: 16px 24px;
+    border-bottom: 1px solid #8FABD4;
+  }
+  
+  .card-body {
+    padding: 24px;
+  }
+  
+  .card-footer {
+    background: #EFECE3;
+    padding: 16px 24px;
+    border-top: 1px solid #8FABD4;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .form-floating {
+    margin-bottom: 20px;
+  }
+  
+  .form-control {
+    border: 1px solid #8FABD4;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background-color: #ffffff;
+    color: #000000;
+  }
+  
+  .form-control:focus {
+    border-color: #4A70A9;
+    box-shadow: 0 0 0 3px rgba(74, 112, 169, 0.1);
+    outline: none;
+  }
+  
+  .form-label {
+    font-weight: 600;
+    color: #000000;
+    margin-bottom: 8px;
+    display: block;
+  }
+  
+  .btn-secondary {
+    background: #8FABD4;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    color: #000000;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  
+  .btn-secondary:hover {
+    background: #4A70A9;
+    transform: translateY(-1px);
+    color: #ffffff;
+    text-decoration: none;
+  }
+  
+  .btn-success {
+    background: linear-gradient(135deg, #8FABD4 0%, #4A70A9 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-weight: 500;
+    color: #ffffff;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(143, 171, 212, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .btn-success:hover {
+    background: linear-gradient(135deg, #4A70A9 0%, #3a5c8f 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(143, 171, 212, 0.4);
+    color: #ffffff;
+  }
+  
+  .alert {
+    border-radius: 8px;
+    border: none;
+    padding: 12px 16px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    border-left: 4px solid;
+  }
+  
+  .alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border-left-color: #10b981;
+  }
+  
+  .alert-danger {
+    background: #fee2e2;
+    color: #991b1b;
+    border-left-color: #ef4444;
+  }
+  
+  .alert-warning {
+    background: #fef3c7;
+    color: #92400e;
+    border-left-color: #f59e0b;
+  }
+  
+  /* CKEditor Customization - Same as original */
+  .cke_chrome {
+    border: 1px solid #8FABD4 !important;
+    border-radius: 8px !important;
+    overflow: hidden;
+  }
+  
+  .cke_top {
+    border-bottom: 1px solid #8FABD4 !important;
+  }
+  
+  @media (max-width: 768px) {
+    .edit-template-card {
+      margin: 0 16px;
+    }
+    
+    .card-body {
+      padding: 20px;
+    }
+    
+    .card-footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .card-footer a, 
+    .card-footer button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .card-body {
+      padding: 16px;
+    }
+    
+    .card-header {
+      padding: 14px 20px;
+    }
+    
+    .card-header h5 {
+      font-size: 18px;
+    }
+    
+    .card-footer {
+      padding: 12px 16px;
+    }
+  }
+</style>
+
+<div class="container" style="max-width: 900px;">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} mb-3" role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="card shadow border-0 edit-template-card">
+    <div class="card-header text-white">
+      <h5 class="mb-0">Edit Template</h5>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="card-body">
+
+        <div class="form-floating mb-4">
+          <input type="text" name="template_name" class="form-control" id="templateName" placeholder=" " required value="{{ template.template_name }}">
+          <label for="templateName" style="font-weight:bolder; color:gray;">Template Name</label>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label" style="font-weight:bolder; color:gray;">Template Content</label>
+          <textarea name="content" id="templateContent">{{ template.content|safe }}</textarea>
+        </div>
+        
+      </div>
+      <div class="card-footer d-flex justify-content-between">
+        <a href="/template_list/" class="btn btn-secondary">← Back</a>
+        <button type="submit" class="btn btn-success">Update Template</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Same CKEditor configuration as original
+  CKEDITOR.replace('templateContent', {
+    height: 200,
+    removePlugins: 'elementspath',
+    resize_enabled: true,
+    toolbarCanCollapse: true
+  });
+</script>
+
+{% endblock %}
+
+
+
+{% comment %} {% extends "userhome.html" %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}
+{% endblock %}
+{% block top_campaigns %} {% endblock %}
 
 {% block main %}
 
@@ -39,9 +287,9 @@
         </div>
 
         <div class="form-floating">
-          {% comment %} <textarea name="content" class="form-control" id="templateContent" style="height: 300px;" placeholder=" " required>{{ template.content }}</textarea> {% endcomment %}
+        
           <textarea name="content" id="templateContent">{{ template.content|safe }}</textarea>
-          {% comment %} <label for="templateContent">Template Content</label> {% endcomment %}
+        
         </div>
         
 
@@ -59,4 +307,4 @@
          CKEDITOR.replace('templateContent');
     </script>
 
-{% endblock %}
+{% endblock %} {% endcomment %}

@@ -4,8 +4,7 @@ from django.db import models
 from django.utils import timezone
 
 def generate_alphanumeric_id():
-    """10-अक्षर का यूनिक अल्फान्यूमेरिक ID जनरेट करता है"""
-    chars = string.ascii_uppercase + string.digits  # A-Z और 0-9
+    chars = string.ascii_uppercase + string.digits
     while True:
         uid = ''.join(random.choices(chars, k=10))
         # यह सुनिश्चित करे कि ID यूनिक हो
@@ -100,6 +99,55 @@ class template(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)  # Auto date/time
     
 
+class SubjectLineFile(models.Model):
+    id = models.AutoField(primary_key=True)
+    user_id = models.CharField(max_length=100)
+    file_name = models.CharField(max_length=255)
+    file = models.FileField(upload_to='subject_lines/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.file_name} - {self.user_id}"
+
+    def get_all_subject_lines(self):
+        """
+        Extract all subject lines from file
+        """
+        try:
+            file_extension = self.file.name.split('.')[-1].lower()
+            subject_lines = []
+            
+            if file_extension in ['xlsx', 'xls']:
+                # Excel file processing
+                df = pd.read_excel(self.file.path)
+                # Assuming first column contains subject lines
+                subject_lines = df.iloc[:, 0].dropna().tolist()
+            elif file_extension in ['txt']:
+                # Text file processing
+                with open(self.file.path, 'r', encoding='utf-8') as file:
+                    subject_lines = [line.strip() for line in file if line.strip()]
+            elif file_extension in ['csv']:
+                # CSV file processing
+                with open(self.file.path, 'r', encoding='utf-8') as file:
+                    subject_lines = [line.strip().split(',')[0] for line in file if line.strip()]
+            else:
+                return []
+                
+            return subject_lines
+            
+        except Exception as e:
+            print(f"Error reading subject line file: {e}")
+            return []
+
+    def get_random_subject_line(self):
+        """
+        Get one random subject line from all available
+        """
+        subject_lines = self.get_all_subject_lines()
+        return random.choice(subject_lines) if subject_lines else None
+
+
+
 class Campaign(models.Model):
     name = models.CharField(max_length=100)
     reply_to = models.EmailField()
@@ -120,6 +168,18 @@ class Campaign(models.Model):
     cta_url = models.URLField(max_length=500, blank=True, null=True)
     is_deleted = models.BooleanField(default=False)
     
+    # ----------------------------------
+    subject_line_file = models.ForeignKey(
+        SubjectLineFile, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='campaigns'
+    )
+    
+    # NEW FIELD: Track which subject was used for tracking
+    used_subject_line = models.TextField(null=True, blank=True)
+    # ------------------------------------
     
     @property
     def status(self):
@@ -140,19 +200,23 @@ class CampaignAttachment(models.Model):
     file = models.FileField(upload_to="attachments/")
 
 
-
 class EmailTracking(models.Model):
     campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE)
     recipient = models.EmailField()
     sent_at = models.DateTimeField(auto_now_add=True)
+    
     is_opened = models.BooleanField(default=False)
     open_timestamp = models.DateTimeField(null=True, blank=True)
+    
     is_clicked = models.BooleanField(default=False)
     click_timestamp = models.DateTimeField(null=True, blank=True)
     
+    is_failed = models.BooleanField(default=False)  # NEW FIELD
+    error_message = models.TextField(null=True, blank=True)  # To store SMTP error if any
 
     def __str__(self):
         return f"{self.recipient} - {self.campaign.name}"
+
     
     
  
@@ -162,9 +226,7 @@ class UnsubscribedEmail(models.Model):
 
     def __str__(self):
         return self.email
-    
-
-
+   
 
 # =============================== for Chat ============================================
 

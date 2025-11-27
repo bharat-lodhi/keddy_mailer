@@ -1,0 +1,408 @@
+<!-- followups/templates/followups/followup_detail.html -->
+{% extends "userhome.html" %}
+
+{% block topbar1 %}{% endblock %}
+{% block outermain %}{% endblock %}
+{% block summary_content %}{% endblock %}
+
+{% block top_campaigns %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">📧 {{ followup_campaign.name }}</h1>
+        <a href="{% url 'followups:followup_dashboard' %}" class="btn btn-outline-secondary">
+            ← Back to Follow-ups
+        </a>
+    </div>
+
+    <!-- Status Messages -->
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Campaign Overview -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Campaign Overview</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Original Campaign:</strong> {{ followup_campaign.original_campaign.name }}</p>
+                            <p><strong>Status:</strong> 
+                                {% if followup_campaign.status == 'active' %}
+                                <span class="badge badge-success">Active</span>
+                                {% elif followup_campaign.status == 'paused' %}
+                                <span class="badge badge-warning">Paused</span>
+                                {% elif followup_campaign.status == 'completed' %}
+                                <span class="badge badge-info">Completed</span>
+                                {% else %}
+                                <span class="badge badge-secondary">Draft</span>
+                                {% endif %}
+                            </p>
+                            <p><strong>Current Sequence:</strong> {{ followup_campaign.current_sequence }}/{{ followup_campaign.max_followups }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Created:</strong> {{ followup_campaign.created_at|date:"M d, Y H:i" }}</p>
+                            <p><strong>Started:</strong> 
+                                {% if followup_campaign.started_at %}
+                                {{ followup_campaign.started_at|date:"M d, Y H:i" }}
+                                {% else %}
+                                <span class="text-muted">Not started</span>
+                                {% endif %}
+                            </p>
+                            <p><strong>Days Between:</strong> {{ followup_campaign.days_between }} days</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="mt-3">
+                        <label><strong>Progress:</strong></label>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar {% if followup_campaign.status == 'active' %}bg-success{% elif followup_campaign.status == 'completed' %}bg-info{% else %}bg-secondary{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ followup_campaign.progress_percentage }}%;" 
+                                 aria-valuenow="{{ followup_campaign.progress_percentage }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                {{ followup_campaign.progress_percentage|floatformat:0 }}%
+                            </div>
+                        </div>
+                        <small class="text-muted">Sequence {{ followup_campaign.current_sequence }} of {{ followup_campaign.max_followups }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                </div>
+                <div class="card-body text-center">
+                   
+                    
+                    <a href="{% url 'followups:followup_analytics' followup_campaign.id %}" 
+                       class="btn btn-info btn-block mb-2">
+                        📊 View Analytics
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Emails Sent</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ followup_campaign.total_emails_sent }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-paper-plane fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Additional Opens</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ followup_campaign.additional_opens }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-envelope-open fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Additional Clicks</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ followup_campaign.additional_clicks }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-mouse-pointer fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Credits Used</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ followup_campaign.total_credits_used }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-coins fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Follow-up Sequences -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Follow-up Sequences</h6>
+            <span class="badge badge-primary">{{ sequences|length }}/{{ followup_campaign.max_followups }} sequences</span>
+        </div>
+        <div class="card-body">
+            {% if sequences %}
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Sequence #</th>
+                            <th>Subject</th>
+                            <th>Status</th>
+                            <th>Sent At</th>
+                            <th>Emails Sent</th>
+                            <th>Credits Used</th>
+                            <th>Days After Previous</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sequence in sequences %}
+                        <tr class="{% if sequence.sequence_number == followup_campaign.current_sequence and followup_campaign.status == 'active' %}table-warning{% elif sequence.is_sent %}table-success{% endif %}">
+                            <td><strong>#{{ sequence.sequence_number }}</strong>
+                                {% if sequence.sequence_number == followup_campaign.current_sequence and followup_campaign.status == 'active' %}
+                                <span class="badge badge-warning ml-1">Current</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ sequence.subject }}</strong>
+                                {% if sequence.sequence_number <= followup_campaign.current_sequence %}
+                                <br>
+                                <small class="text-muted">{{ sequence.body|truncatewords:10 }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if sequence.is_sent %}
+                                <span class="badge badge-success">Sent</span>
+                                {% elif sequence.sequence_number == followup_campaign.current_sequence and followup_campaign.status == 'active' %}
+                                <span class="badge badge-warning">Sending</span>
+                                {% elif sequence.sequence_number < followup_campaign.current_sequence %}
+                                <span class="badge badge-secondary">Skipped</span>
+                                {% else %}
+                                <span class="badge badge-secondary">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if sequence.sent_at %}
+                                {{ sequence.sent_at|date:"M d, Y H:i" }}
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ sequence.total_sent }}</td>
+                            <td>{{ sequence.credits_used }}</td>
+                            <td>
+                                {% if sequence.sequence_number == 1 %}
+                                {{ followup_campaign.days_between }} days after original
+                                {% else %}
+                                {{ sequence.days_after_previous }} days
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-envelope fa-3x text-gray-300 mb-3"></i>
+                <h5 class="text-gray-500">No Sequences Created</h5>
+                <p class="text-gray-500">This follow-up campaign doesn't have any sequences yet.</p>
+                <a href="{% url 'followups:create_followup_campaign' followup_campaign.original_campaign.id %}" class="btn btn-primary">
+                    Create Sequences
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Campaign Settings & Tracking -->
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Campaign Settings</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td width="40%"><strong>Stop on Open:</strong></td>
+                            <td>
+                                {% if followup_campaign.stop_on_open %}
+                                <span class="badge badge-success">Yes</span>
+                                <small class="text-muted d-block">Stop if recipient opens any email</small>
+                                {% else %}
+                                <span class="badge badge-secondary">No</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Stop on Click:</strong></td>
+                            <td>
+                                {% if followup_campaign.stop_on_click %}
+                                <span class="badge badge-success">Yes</span>
+                                <small class="text-muted d-block">Stop if recipient clicks any link</small>
+                                {% else %}
+                                <span class="badge badge-secondary">No</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Trigger Time:</strong></td>
+                            <td>{{ followup_campaign.trigger_time }}
+                                <small class="text-muted d-block">Daily send time</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Max Follow-ups:</strong></td>
+                            <td>{{ followup_campaign.max_followups }}
+                                <small class="text-muted d-block">Maximum sequences to send</small>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Tracking Summary</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td width="40%"><strong>Total Sent:</strong></td>
+                            <td>{{ tracking_stats.total_sent|default:0 }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total Opens:</strong></td>
+                            <td>
+                                {{ tracking_stats.total_opens|default:0 }}
+                                {% if tracking_stats.total_sent and tracking_stats.total_sent > 0 %}
+                                <small class="text-muted">
+                                    ({{ tracking_stats.total_opens|default:0|floatformat:1 }}%)
+                                </small>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total Clicks:</strong></td>
+                            <td>
+                                {{ tracking_stats.total_clicks|default:0 }}
+                                {% if tracking_stats.total_sent and tracking_stats.total_sent > 0 %}
+                                <small class="text-muted">
+                                    ({{ tracking_stats.total_clicks|default:0|floatformat:1 }}%)
+                                </small>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Active Recipients:</strong></td>
+                            <td>
+                                {{ tracking_stats.active_recipients|default:0 }}
+                                <small class="text-muted d-block">Still receiving follow-ups</small>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Preview -->
+    {% if analytics %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Analytics Overview</h6>
+        </div>
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-md-3 mb-3">
+                    <div class="border rounded p-3">
+                        <h3 class="text-primary">{{ analytics.overall_open_rate|floatformat:1 }}%</h3>
+                        <p class="mb-0">Open Rate</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="border rounded p-3">
+                        <h3 class="text-success">{{ analytics.overall_click_rate|floatformat:1 }}%</h3>
+                        <p class="mb-0">Click Rate</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="border rounded p-3">
+                        <h3 class="text-info">{{ analytics.total_followups_sent }}</h3>
+                        <p class="mb-0">Total Follow-ups Sent</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="border rounded p-3">
+                        <h3 class="text-warning">{{ analytics.additional_conversions }}</h3>
+                        <p class="mb-0">Additional Conversions</p>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{% url 'followups:followup_analytics' followup_campaign.id %}" class="btn btn-primary">
+                    View Detailed Analytics
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Auto-refresh for active campaigns -->
+{% if followup_campaign.status == 'active' %}
+<script>
+// Auto-refresh every 30 seconds for active campaigns
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        window.location.reload();
+    }, 30000);
+    
+    // Show refresh notification
+    console.log('Auto-refreQuick Actionssh enabled for active campaign');
+});
+</script>
+{% endif %}
+{% endblock %}

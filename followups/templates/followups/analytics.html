@@ -1,0 +1,275 @@
+<!-- followups/templates/followups/analytics.html -->
+{% extends "userhome.html" %}
+
+{% block topbar1 %}{% endblock %}
+
+{% block outermain %}{% endblock %}
+
+{% block summary_content %}{% endblock %}
+
+{% block top_campaigns %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">📈 {{ followup_campaign.name }} - Analytics</h1>
+        <div>
+            <a href="{% url 'followups:followup_campaign_detail' followup_campaign.id %}" class="btn btn-info">
+                ← Campaign Details
+            </a>
+            <a href="{% url 'followups:followup_dashboard' %}" class="btn btn-outline-secondary">
+                ← All Follow-ups
+            </a>
+        </div>
+    </div>
+
+    <!-- Overall Performance -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">📊 Overall Performance</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-bar">
+                        <canvas id="performanceChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">📈 Key Metrics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                        <div class="h1 font-weight-bold text-primary">
+                            {{ analytics.overall_open_rate|floatformat:1 }}%
+                        </div>
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Overall Open Rate
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="text-center">
+                        <div class="h1 font-weight-bold text-success">
+                            {{ analytics.overall_click_rate|floatformat:1 }}%
+                        </div>
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Overall Click Rate
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="text-center">
+                        <div class="h1 font-weight-bold text-info">
+                            {{ analytics.additional_conversions }}
+                        </div>
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Additional Conversions
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sequence-wise Performance -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">📨 Sequence Performance</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Sequence #</th>
+                            <th>Subject</th>
+                            <th>Sent</th>
+                            <th>Opened</th>
+                            <th>Clicked</th>
+                            <th>Open Rate</th>
+                            <th>Click Rate</th>
+                            <th>Sent At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for seq in sequences_data %}
+                        <tr>
+                            <td><strong>#{{ seq.sequence_number }}</strong></td>
+                            <td title="{{ seq.subject }}">
+                                {{ seq.subject|truncatewords:5 }}
+                            </td>
+                            <td>{{ seq.sent_count }}</td>
+                            <td class="{% if seq.open_count > 0 %}text-success{% endif %}">
+                                {{ seq.open_count }}
+                            </td>
+                            <td class="{% if seq.click_count > 0 %}text-warning{% endif %}">
+                                {{ seq.click_count }}
+                            </td>
+                            <td>
+                                {% if seq.sent_count > 0 %}
+                                {{ seq.open_count|floatformat:1 }}%
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if seq.sent_count > 0 %}
+                                {{ seq.click_count|floatformat:1 }}%
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if seq.sent_at %}
+                                {{ seq.sent_at|date:"M d, Y H:i" }}
+                                {% else %}
+                                <span class="text-muted">Not sent yet</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROI Calculation -->
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">💰 ROI Analysis</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td><strong>Total Credits Used:</strong></td>
+                            <td class="text-right">{{ followup_campaign.total_credits_used }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Additional Opens Generated:</strong></td>
+                            <td class="text-right text-success">+{{ followup_campaign.additional_opens }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Additional Clicks Generated:</strong></td>
+                            <td class="text-right text-warning">+{{ followup_campaign.additional_clicks }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cost per Open:</strong></td>
+                            <td class="text-right">
+                                {% if followup_campaign.additional_opens > 0 %}
+                                {{ followup_campaign.total_credits_used|floatformat:2 }} credits
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cost per Click:</strong></td>
+                            <td class="text-right">
+                                {% if followup_campaign.additional_clicks > 0 %}
+                                {{ followup_campaign.total_credits_used|floatformat:2 }} credits
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">📋 Campaign Summary</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td><strong>Status:</strong></td>
+                            <td class="text-right">
+                                <span class="badge 
+                                    {% if followup_campaign.status == 'active' %}badge-success
+                                    {% elif followup_campaign.status == 'completed' %}badge-info
+                                    {% elif followup_campaign.status == 'paused' %}badge-warning
+                                    {% else %}badge-secondary{% endif %}">
+                                    {{ followup_campaign.status|title }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Progress:</strong></td>
+                            <td class="text-right">
+                                {{ followup_campaign.current_sequence }}/{{ followup_campaign.max_followups }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total Emails Sent:</strong></td>
+                            <td class="text-right">{{ followup_campaign.total_emails_sent }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Active Recipients:</strong></td>
+                            <td class="text-right">{{ tracking_stats.active_recipients }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Last Updated:</strong></td>
+                            <td class="text-right">{{ analytics.updated_at|date:"M d, Y H:i" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Performance Chart
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    const performanceChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{% for seq in sequences_data %}'Sequence #{{ seq.sequence_number }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [
+                {
+                    label: 'Sent',
+                    data: [{% for seq in sequences_data %}{{ seq.sent_count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                    backgroundColor: '#4e73df',
+                },
+                {
+                    label: 'Opened',
+                    data: [{% for seq in sequences_data %}{{ seq.open_count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                    backgroundColor: '#1cc88a',
+                },
+                {
+                    label: 'Clicked',
+                    data: [{% for seq in sequences_data %}{{ seq.click_count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                    backgroundColor: '#f6c23e',
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        drawBorder: false
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

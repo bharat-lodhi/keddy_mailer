@@ -15,7 +15,7 @@ import os
 import csv
 import xlrd
 from django.conf import settings
-from .models import Campaign, SMTPServer, email_list, template,CustomUser,UnsubscribedEmail,CampaignAttachment,SMTPUsageLog
+from .models import Campaign, SMTPServer, email_list, template,CustomUser,UnsubscribedEmail,CampaignAttachment,SMTPUsageLog,SubjectLineFile
 
 from django.utils.timezone import make_aware
 from datetime import datetime
@@ -360,7 +360,10 @@ def add_server(request):
                 server = smtplib.SMTP(host, port)
                 if security == "TLS":
                     server.starttls()
-            
+                elif security in ["None", None]:
+                    pass 
+        
+        
             server.login(username, password)
             server.send_message(test_msg)
             server.quit()
@@ -391,55 +394,6 @@ def add_server(request):
 
     else:
         return render(request, "add_server.html", context)
-
-
-
-
-
-
-# def verify_server(request):
-#     user_id = request.session.get("user_id")
-#     vemail = request.GET.get('vemail')
-
-#     if not user_id:
-#         messages.error(request, "Session expired. Please log in again.")
-#         return redirect('/login/')  # or wherever your login page is
-
-#     try:
-#         updated = SMTPServer.objects.filter(username=vemail).update(is_active=1)
-#         if updated:
-#             messages.success(request, "SMTP server added and verified successfully.")
-#         else:
-#             messages.error(request, "No matching server found or already verified.")
-#     except Exception as e:
-#         messages.error(request, f"Failed to verify server: {str(e)}")
-
-#     return redirect("/add_server/")
-
-
-# def smtp_server_list(request):
-#     user_id = request.session.get("user_id")
-#     smtp_servers = SMTPServer.objects.filter(user_id=user_id).order_by('-created_at')
-#     user = get_object_or_404(CustomUser, uid=user_id)
-
-#     credit_limit = user.email_credit_limit
-#     used_credit = user.used_email_credit
-#     credits_left = max(0, credit_limit - used_credit)
-#     credit_percent = int((credits_left / credit_limit) * 100) if credit_limit > 0 else 0
-    
-#     uname = request.session.get("name")
-#     obj = CustomUser.objects.get(uid=user_id)
-#     company_name = obj.company
-#     context={
-#         "company_name":company_name,
-#         "uname":uname,
-#         "credits_left":credits_left,
-#         'smtp_servers': smtp_servers,
-#         "user":user,
-#         "credit_limit":credit_limit,
-#         "credit_percent":credit_percent,
-#     }
-#     return render(request, 'smtp_list.html',context)
 
 
 from django.utils import timezone
@@ -661,6 +615,48 @@ def edit_email_list(request, list_id):
 
 
 
+# def add_template(request):
+#     # -------------session--------------
+#     user_id = request.session.get("user_id")
+#     uname = request.session.get("name")
+#     email = request.session.get("email")    
+#     # ----------------------------------
+    
+#     user = get_object_or_404(CustomUser, uid=user_id)
+
+#     credit_limit = user.email_credit_limit
+#     used_credit = user.used_email_credit
+#     credits_left = max(0, credit_limit - used_credit)
+#     credit_percent = int((credits_left / credit_limit) * 100) if credit_limit > 0 else 0
+#     context={
+#         "company_name":user.company,
+#         "uname":uname,
+#         "user":user,
+#         "credit_limit":credit_limit,
+#         "credit_percent":credit_percent,
+#         "credits_left":credits_left,
+        
+#     }
+
+#     if request.method == "POST":
+                
+#         template_name = request.POST.get("template_name")
+#         content = request.POST.get("content")
+#         try:
+#             obj = template(user_id = user_id,template_name = template_name , content = content)
+#             obj.save()
+#             messages.success(request, "Template added successfully.")
+#             return render(request,"add_template.html",context)
+#         except Exception as e:
+#             print(e)
+#             messages.error(request, f"Failed to add template: {str(e)}")
+#             return render(request,"add_template.html",context)
+    
+#     return render(request ,"add_template.html",context)
+
+# views.py mein add_template function mein yeh add karein
+from .spam_checker import EmailSpamChecker
+
 def add_template(request):
     # -------------session--------------
     user_id = request.session.get("user_id")
@@ -674,6 +670,7 @@ def add_template(request):
     used_credit = user.used_email_credit
     credits_left = max(0, credit_limit - used_credit)
     credit_percent = int((credits_left / credit_limit) * 100) if credit_limit > 0 else 0
+    
     context={
         "company_name":user.company,
         "uname":uname,
@@ -681,13 +678,25 @@ def add_template(request):
         "credit_limit":credit_limit,
         "credit_percent":credit_percent,
         "credits_left":credits_left,
-        
     }
 
     if request.method == "POST":
-                
         template_name = request.POST.get("template_name")
         content = request.POST.get("content")
+        
+        # ✅ SPAM CHECK BEFORE SAVING
+        spam_checker = EmailSpamChecker()
+        spam_result = spam_checker.get_detailed_analysis(content, template_name)
+        
+        # Agar spam probability high hai to warning show karein
+        if spam_result['spam_probability'] > 70:
+            messages.warning(request, 
+                f"⚠️ High spam risk detected ({spam_result['spam_probability']}%). "
+                f"Consider revising your template. Detected: {', '.join([p['category'] for p in spam_result['detected_patterns']['body'][:2]])}"
+            )
+            # Phir bhi save karne dein, lekin warning dein
+            # Ya phir return kar dein without saving: return render(request,"add_template.html",context)
+        
         try:
             obj = template(user_id = user_id,template_name = template_name , content = content)
             obj.save()
@@ -699,6 +708,8 @@ def add_template(request):
             return render(request,"add_template.html",context)
     
     return render(request ,"add_template.html",context)
+
+
 
 
 # Show list of templates
@@ -846,6 +857,162 @@ def extract_recipients_from_text(text):
 
 
 
+# def create_campaign(request):
+#     from .tasks import send_bulk_emails_task
+#     user_id = request.session.get("user_id")
+#     obj = CustomUser.objects.get(uid=user_id)
+    
+#     if request.method == 'POST':
+#         action = request.POST.get('action')  # 'send_now' or 'schedule'
+#         name = request.POST.get('name')
+#         reply_to = request.POST.get('reply_to')
+#         subject = request.POST.get('subject')
+#         preheader = request.POST.get('placeholder_text')
+#         sender_name = request.POST.get('sender_name')
+#         scheduled_time_raw = request.POST.get('scheduled_time')
+#         cta_text = request.POST.get("cta_text", "").strip()
+#         cta_url = request.POST.get("cta_url")
+        
+
+        
+#         attachments = request.FILES.getlist('attachments[]')
+#         print(attachments , "*"*30)
+#         print(len(attachments) , "*"*30)
+#         print("FILES:", request.FILES)
+#         print("ATTACHMENTS:", request.FILES.getlist('attachments[]'))
+        
+#         scheduled_time = None
+#         if scheduled_time_raw:
+#             dt = datetime.strptime(scheduled_time_raw, "%Y-%m-%dT%H:%M")
+#             scheduled_time = make_aware(dt)
+
+#         email_list_id = request.POST.get('email_list')
+#         template_id = request.POST.get('template')
+#         smtp_id = request.POST.get('smtp_server')
+        
+       
+
+#         email_list_obj = email_list.objects.get(id=email_list_id) if email_list_id else None
+#         template_obj = template.objects.get(id=template_id) if template_id else None
+#         smtp = SMTPServer.objects.get(id=smtp_id)
+
+#         custom_recipients_text = request.POST.get('customRecipients')
+#         custom_template_content = request.POST.get('customTemplate')
+
+#         if custom_recipients_text:
+#             recipients = extract_recipients_from_text(custom_recipients_text)
+#         else:
+#             file_path = email_list_obj.file.path
+#             recipients = extract_recipients_from_file(file_path)
+
+#         if custom_template_content:
+#             template1 = custom_template_content
+#         else:
+#             template1 = template_obj.content
+
+#         # ✅ Get current user object
+#         user = CustomUser.objects.get(uid=user_id)
+        
+#         start_of_month = now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+#         monthly_sent = EmailTracking.objects.filter(
+#             campaign__user_id=user_id,
+#             sent_at__gte=start_of_month
+#         ).count()
+        
+#         if user.used_email_credit >= user.email_credit_limit:
+#             messages.error(request,"Email credit limit reached")
+#             return redirect("/create_campaign/")
+#         else:
+#             # ✅ Step 1: Create campaign FIRST
+#             campaign = Campaign.objects.create(
+#                 name=name,
+#                 reply_to=reply_to,
+#                 email_list=email_list_obj,
+#                 subject=subject,
+#                 template=template_obj,
+#                 preheader=preheader,
+#                 smtp_server=smtp,
+#                 sender_name=sender_name,
+#                 user_id=user_id,
+#                 scheduled_time=scheduled_time if action == 'schedule' else None,
+#                 is_sent=False,
+#                 manual_recipients=custom_recipients_text or None,
+#                 custom_template=custom_template_content or None,
+#                 cta_text=cta_text,
+#                 cta_url = cta_url,
+#             )
+            
+#             for file in attachments:
+#                 CampaignAttachment.objects.create(campaign=campaign, file=file)
+
+#             # ✅ Step 2: Now tracking_html with campaign.id
+#             from urllib.parse import quote  # at top of views.py
+            
+#             # file_name = campaign.attachments.name.split("/")[-1] if campaign.attachments else ""
+#             # file_name = quote(campaign.attachments.name.split("/")[-1]) if campaign.attachments else ""
+
+#             tracking_block = generate_tracking_block(campaign)
+#             template1 += tracking_block
+
+
+#             smtp_data = {
+#                 'host': smtp.host,
+#                 'port': smtp.port,
+#                 'username': smtp.username,
+#                 'password': smtp.password,
+#                 'security': smtp.security,
+#             }
+
+#             attachment_paths = [
+#                 attachment.file.path
+#                 for attachment in campaign.attachment_files.all()
+#             ]
+            
+            
+            
+#             if action == 'send_now':
+#                 send_bulk_emails_task.delay(
+#                     smtp_data=smtp_data,
+#                     reply_to=reply_to,
+#                     from_email=smtp.from_email,
+#                     subject=subject,
+#                     body_template=template1,
+#                     recipients=recipients,
+#                     preheader=preheader,
+#                     attachment_path=attachment_paths,
+#                     sender_name=sender_name,
+#                     campaign_id=campaign.id  # ✅ Required for EmailTracking
+#                 )
+#                 messages.success(request, "Campaign sent successfully.")
+#             else:
+#                 messages.success(request, f"Campaign scheduled for {scheduled_time}.")
+                
+#             return redirect('/campaign_success/')
+        
+#     user = get_object_or_404(CustomUser, uid=user_id)
+
+#     credit_limit = user.email_credit_limit
+#     used_credit = user.used_email_credit
+#     credits_left = max(0, credit_limit - used_credit)
+#     credit_percent = int((credits_left / credit_limit) * 100) if credit_limit > 0 else 0  
+    
+    
+
+          
+#     context = {
+#         'email_lists': email_list.objects.filter(user_id=user_id).order_by('-uploaded_at'),
+#         'templates': template.objects.filter(Q(user_id=user_id) | Q(user_id__isnull=True)).order_by('-uploaded_at'),
+#         'smtps': SMTPServer.objects.filter(user_id=user_id,is_active=1).order_by('-created_at'),
+#         'uname': user.name,
+#         "company_name":user.company,
+#         "user":user,
+#         "credit_limit":credit_limit,
+#         "credit_percent":credit_percent,
+#         "credits_left":credits_left,
+#     }
+#     return render(request, 'create_campaign.html', context)
+
+
 def create_campaign(request):
     from .tasks import send_bulk_emails_task
     user_id = request.session.get("user_id")
@@ -855,20 +1022,20 @@ def create_campaign(request):
         action = request.POST.get('action')  # 'send_now' or 'schedule'
         name = request.POST.get('name')
         reply_to = request.POST.get('reply_to')
-        subject = request.POST.get('subject')
+        subject = request.POST.get('subject')  # This can be empty now
         preheader = request.POST.get('placeholder_text')
         sender_name = request.POST.get('sender_name')
         scheduled_time_raw = request.POST.get('scheduled_time')
         cta_text = request.POST.get("cta_text", "").strip()
         cta_url = request.POST.get("cta_url")
         
+        # NEW: Get subject line file
+        subject_line_file_id = request.POST.get('subject_line_file')
+        subject_line_file_obj = None
+        if subject_line_file_id:
+            subject_line_file_obj = SubjectLineFile.objects.get(id=subject_line_file_id)
 
-        
         attachments = request.FILES.getlist('attachments[]')
-        print(attachments , "*"*30)
-        print(len(attachments) , "*"*30)
-        print("FILES:", request.FILES)
-        print("ATTACHMENTS:", request.FILES.getlist('attachments[]'))
         
         scheduled_time = None
         if scheduled_time_raw:
@@ -878,8 +1045,6 @@ def create_campaign(request):
         email_list_id = request.POST.get('email_list')
         template_id = request.POST.get('template')
         smtp_id = request.POST.get('smtp_server')
-        
-       
 
         email_list_obj = email_list.objects.get(id=email_list_id) if email_list_id else None
         template_obj = template.objects.get(id=template_id) if template_id else None
@@ -912,12 +1077,12 @@ def create_campaign(request):
             messages.error(request,"Email credit limit reached")
             return redirect("/create_campaign/")
         else:
-            # ✅ Step 1: Create campaign FIRST
+            # ✅ Create campaign with subject line file
             campaign = Campaign.objects.create(
                 name=name,
                 reply_to=reply_to,
                 email_list=email_list_obj,
-                subject=subject,
+                subject=subject,  # This can be empty if using subject line file
                 template=template_obj,
                 preheader=preheader,
                 smtp_server=smtp,
@@ -928,21 +1093,15 @@ def create_campaign(request):
                 manual_recipients=custom_recipients_text or None,
                 custom_template=custom_template_content or None,
                 cta_text=cta_text,
-                cta_url = cta_url,
+                cta_url=cta_url,
+                subject_line_file=subject_line_file_obj,  # NEW FIELD
             )
             
             for file in attachments:
                 CampaignAttachment.objects.create(campaign=campaign, file=file)
 
-            # ✅ Step 2: Now tracking_html with campaign.id
-            from urllib.parse import quote  # at top of views.py
-            
-            # file_name = campaign.attachments.name.split("/")[-1] if campaign.attachments else ""
-            # file_name = quote(campaign.attachments.name.split("/")[-1]) if campaign.attachments else ""
-
             tracking_block = generate_tracking_block(campaign)
             template1 += tracking_block
-
 
             smtp_data = {
                 'host': smtp.host,
@@ -957,41 +1116,41 @@ def create_campaign(request):
                 for attachment in campaign.attachment_files.all()
             ]
             
-            
-            
             if action == 'send_now':
                 send_bulk_emails_task.delay(
                     smtp_data=smtp_data,
                     reply_to=reply_to,
                     from_email=smtp.from_email,
-                    subject=subject,
+                    subject=subject,  # This will be overridden if subject_line_file exists
                     body_template=template1,
                     recipients=recipients,
                     preheader=preheader,
                     attachment_path=attachment_paths,
                     sender_name=sender_name,
-                    campaign_id=campaign.id  # ✅ Required for EmailTracking
+                    campaign_id=campaign.id,
+                    # subject_line_file_id=subject_line_file_obj.id if subject_line_file_obj else None  # NEW
                 )
                 messages.success(request, "Campaign sent successfully.")
             else:
                 messages.success(request, f"Campaign scheduled for {scheduled_time}.")
                 
             return redirect('/campaign_success/')
-        
+    
+    # GET request - show form
     user = get_object_or_404(CustomUser, uid=user_id)
-
     credit_limit = user.email_credit_limit
     used_credit = user.used_email_credit
     credits_left = max(0, credit_limit - used_credit)
     credit_percent = int((credits_left / credit_limit) * 100) if credit_limit > 0 else 0  
-    
-    
 
-          
+    # NEW: Get subject line files for this user
+    subject_line_files = SubjectLineFile.objects.filter(user_id=user_id).order_by('-uploaded_at')
+    
     context = {
         'email_lists': email_list.objects.filter(user_id=user_id).order_by('-uploaded_at'),
         'templates': template.objects.filter(Q(user_id=user_id) | Q(user_id__isnull=True)).order_by('-uploaded_at'),
         'smtps': SMTPServer.objects.filter(user_id=user_id,is_active=1).order_by('-created_at'),
+        'subject_line_files': subject_line_files,  # NEW
         'uname': user.name,
         "company_name":user.company,
         "user":user,
@@ -1000,6 +1159,95 @@ def create_campaign(request):
         "credits_left":credits_left,
     }
     return render(request, 'create_campaign.html', context)
+
+
+def add_subject_line_file(request):
+    user_id = request.session.get("user_id")
+    user = get_object_or_404(CustomUser, uid=user_id)
+
+    if request.method == "POST":
+        file_name = request.POST.get("file_name")
+        uploaded_file = request.FILES['file']
+        
+        # Validate file type
+        allowed_extensions = ['.xlsx', '.xls', '.csv', '.txt']
+        file_extension = os.path.splitext(uploaded_file.name)[1].lower()
+        
+        if file_extension not in allowed_extensions:
+            messages.error(request, "Please upload only Excel, CSV, or Text files.")
+            return redirect("/add_subject_line_file/")
+        
+        try:
+            # Create database record
+            obj = SubjectLineFile(
+                user_id=user_id,
+                file_name=file_name,
+                file=uploaded_file
+            )
+            obj.save()
+            messages.success(request, "Subject line file uploaded successfully.")
+            return redirect("/add_subject_line_file/")
+        except Exception as e:
+            messages.error(request, f"Failed to upload file: {str(e)}")
+            return redirect("/add_subject_line_file/")
+
+    credit_limit = user.email_credit_limit
+    used_credit = user.used_email_credit
+    credits_left = max(0, credit_limit - used_credit)
+    credit_percent = int((credits_left / credit_limit) * 100) if credit_limit > 0 else 0
+    
+    context = {
+        "company_name": user.company,
+        "uname": user.name,
+        "user": user,
+        "credit_limit": credit_limit,
+        "credit_percent": credit_percent,
+        "credits_left": credits_left,
+    }
+    return render(request, "add_subject_line_file.html", context)
+
+def subject_line_files_list(request):
+    user_id = request.session.get("user_id")
+    user = get_object_or_404(CustomUser, uid=user_id)
+    
+    # Get all subject line files for this user
+    subject_line_files = SubjectLineFile.objects.filter(user_id=user_id).order_by('-uploaded_at')
+    
+    # Count subject lines for each file
+    files_with_count = []
+    for file in subject_line_files:
+        subject_lines = file.get_all_subject_lines()
+        files_with_count.append({
+            'file': file,
+            'subject_count': len(subject_lines),
+            'sample_subjects': subject_lines[:2]  # First 2 subjects for preview
+        })
+
+    credit_limit = user.email_credit_limit
+    used_credit = user.used_email_credit
+    credits_left = max(0, credit_limit - used_credit)
+    credit_percent = int((credits_left / credit_limit) * 100) if credit_limit > 0 else 0
+    
+    context = {
+        "company_name": user.company,
+        "uname": user.name,
+        "user": user,
+        "credit_limit": credit_limit,
+        "credit_percent": credit_percent,
+        "credits_left": credits_left,
+        "files_with_count": files_with_count,
+    }
+    return render(request, "subject_line_files_list.html", context)
+
+def delete_subject_line_file(request, file_id):
+    user_id = request.session.get("user_id")
+    try:
+        file_obj = get_object_or_404(SubjectLineFile, id=file_id, user_id=user_id)
+        file_obj.delete()
+        messages.success(request, "Subject line file deleted successfully.")
+    except Exception as e:
+        messages.error(request, f"Failed to delete file: {str(e)}")
+    return redirect("/subject_line_files/")
 
 
 def campaign_list(request):
@@ -1068,30 +1316,50 @@ from django.utils.timezone import now
 from .models import EmailTracking
 
 def track_open(request, campaign_id, email):
-    EmailTracking.objects.filter(campaign_id=campaign_id, recipient=email).update(
+    """
+    Called when the email's invisible pixel is loaded.
+    Marks email as opened if it was successfully sent (is_failed=False)
+    """
+    EmailTracking.objects.filter(
+        campaign_id=campaign_id,
+        recipient=email,
+        is_failed=False  # Only update if not failed
+    ).update(
         is_opened=True,
-        open_timestamp=now()
+        open_timestamp=timezone.now()
     )
-    return HttpResponse(b"")  # invisible image response
+    return HttpResponse(b"")  # invisible 1x1 image response
+
 
 def track_click(request, campaign_id, email):
-    EmailTracking.objects.filter(campaign_id=campaign_id, recipient=email).update(
+    """
+    Called when the CTA or download link is clicked.
+    Marks email as clicked and opened (if not failed)
+    """
+    EmailTracking.objects.filter(
+        campaign_id=campaign_id,
+        recipient=email,
+        is_failed=False
+    ).update(
         is_clicked=True,
-        click_timestamp=now(),
-        is_opened=True,  # if clicked, we can assume opened
-        open_timestamp=now()
+        click_timestamp=timezone.now(),
+        is_opened=True,
+        open_timestamp=timezone.now()
     )
-    return redirect(request.GET.get("url", "https://google.com"))
+    
+    # Redirect to the original URL
+    redirect_url = request.GET.get("url", "https://google.com")
+    return redirect(redirect_url)
 
 
 
 
-from django.http import FileResponse, Http404
-from django.utils.timezone import now
-from .models import EmailTracking
-import os
-from django.conf import settings
-from urllib.parse import unquote
+# from django.http import FileResponse, Http404
+# from django.utils.timezone import now
+# from .models import EmailTracking
+# import os
+# from django.conf import settings
+# from urllib.parse import unquote
 
 
 
@@ -1418,62 +1686,125 @@ def get_user_name(email):
     user = CustomUser.objects.filter(email=email).first()
     return user.name if user else email
 
-# from django.shortcuts import render
-# from django.http import JsonResponse
-# from .models import CustomUser, ChatMessage
-# from django.views.decorators.csrf import csrf_exempt
-# from django.utils import timezone
-# import json
-
-# def admin_chat_panel(request):
-#     users = CustomUser.objects.filter(role="user")
-#     return render(request, "admin_chat.html", {"users": users})
 
 
-# @csrf_exempt
-# def admin_send_message(request):
-#     if request.method == "POST":
-#         # admin_email = request.session.get("email")
-#         data = json.loads(request.body)
-#         sender = "admin@example.com"  # static admin email
-#         receiver = data.get("receiver_email")
-#         message = data.get("message")
 
-#         if not receiver or not message:
-#             return JsonResponse({"status": "error", "msg": "Missing fields"})
+def content_studio(request):
+    user_id = request.session.get("user_id")
+    uname = request.session.get("name")
+    user = get_object_or_404(CustomUser, uid=user_id)
 
-#         ChatMessage.objects.create(
-#             sender_email=sender,
-#             receiver_email=receiver,
-#             message=message,
-#             timestamp=timezone.now()
-#         )
-#         return JsonResponse({"status": "success"})
+    credit_limit = user.email_credit_limit
+    used_credit = user.used_email_credit
+    credits_left = max(0, credit_limit - used_credit)
+    credit_percent = int((credits_left / credit_limit) * 100) if credit_limit > 0 else 0
+
+    context = {
+        "company_name": user.company,
+        "uname": uname,
+        "credits_left": credits_left,
+        "user": user,
+        "credit_limit": credit_limit,
+        "credit_percent": credit_percent,
+        
+    }
+    return render(request,"content_studio.html",context)
+
+# ---------------------------------NEW CODE-------------------------------------------------------------------------------------------------------
+
+def campaign_detail(request, campaign_id):
+    campaign = get_object_or_404(Campaign, id=campaign_id)
+    emails = EmailTracking.objects.filter(campaign=campaign)
+
+    # ✅ Emails grouped by status
+    # sent_emails = emails.filter(is_failed=False)
+    sent_emails = emails.filter(is_failed=False, is_opened=False, is_clicked=False)
+    failed_emails = emails.filter(is_failed=True)
+    opened_emails = emails.filter(is_opened=True, is_failed=False)
+    clicked_emails = emails.filter(is_clicked=True, is_failed=False)
+
+    user_id = request.session.get("user_id")
+    user = get_object_or_404(CustomUser, uid=user_id)
+
+    credit_limit = user.email_credit_limit
+    used_credit = user.used_email_credit
+    credits_left = max(0, credit_limit - used_credit)
+    credit_percent = int((credits_left / credit_limit) * 100) if credit_limit > 0 else 0
+    
+    uname = request.session.get("name")
+    company_name = user.company
+    
+    context = {
+        "company_name": company_name,
+        "uname": uname,
+        "credits_left": credits_left,
+        "user": user,
+        "credit_limit": credit_limit,
+        "credit_percent": credit_percent,
+        
+        'campaign': campaign,
+        'emails': emails,
+        'summary': {
+            'total': emails.count(),
+            'sent': sent_emails.count(),
+            'failed': failed_emails.count(),
+            'opened': opened_emails.count(),
+            'clicked': clicked_emails.count(),
+        },
+        'email_lists': {  # 🔹 Dictionary of emails by status
+            'sent': sent_emails,
+            'failed': failed_emails,
+            'opened': opened_emails,
+            'clicked': clicked_emails,
+        }
+    }
+    return render(request, 'campaign_detail.html', context)
 
 
-# def admin_fetch_messages(request):
-#     if request.method == "GET":
-#         admin_email = "admin@example.com"
-#         user_email = request.GET.get("user_email")
-#         if not user_email:
-#             return JsonResponse({"status": "error", "msg": "User not selected"})
 
-#         messages = ChatMessage.objects.filter(
-#             sender_email__in=[admin_email, user_email],
-#             receiver_email__in=[admin_email, user_email]
-#         ).order_by("timestamp")
 
-#         data = [
-#             {
-#                 "sender": m.sender_email,
-#                 "message": m.message,
-#                 "time": m.timestamp.strftime("%H:%M")
-#             }
-#             for m in messages
-#         ]
-#         return JsonResponse({"status": "success", "messages": data})
+
+# views.py mein naya function add karein
+from django.http import JsonResponse
+from keddy_mailer.spam_checker import EmailSpamChecker
+
+def check_spam_score_api(request):
+    """
+    AJAX API for real-time spam checking
+    """
+    if request.method == "POST":
+        subject = request.POST.get("subject", "")
+        body = request.POST.get("body", "")
+        
+        checker = EmailSpamChecker()
+        result = checker.get_detailed_analysis(body, subject)
+        
+        return JsonResponse({
+            'success': True,
+            'spam_probability': result['spam_probability'],
+            'spam_level': result['spam_level'],
+            'risk_color': result['risk_color'],
+            'is_spam': result['is_spam'],
+            'suggestions': result['suggestions'],
+            'detected_patterns': result['detected_patterns']['body']
+        })
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
+
+
+
+
+
+
+
+
+
+
 
 # ================================ ADMIN DESHBOARD LOGIC  =================================================================================================
+# ================================ ADMIN DESHBOARD LOGIC  =================================================================================================
+# ================================ ADMIN DESHBOARD LOGIC  =================================================================================================
+
 from django.db.models.functions import TruncMonth
 from django.db.models import Count
 from django.utils.timezone import now
@@ -2072,3 +2403,4 @@ def change_admin_password(request):
         return redirect("/change_admin_password/")
 
     return render(request, "admin_change_password.html", context)
+

@@ -1,0 +1,384 @@
+{% extends "userhome.html" %}
+
+{% load static %}
+
+{% block topbar %}{% endblock %}
+{% block summary_content %}{% endblock %}
+{% block other %}{% endblock %}
+{% block top_campaigns %}{% endblock %}
+{% block topbar1 %}{% endblock %}
+
+{% block main %}
+<div class="container-fluid py-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+
+            <!-- Upload Form Card -->
+            <div class="card border-0 shadow-sm theme-card">
+                <div class="card-header bg-transparent py-3 theme-card-header">
+                    <h5 class="card-title mb-0 text-black">
+                        <i class="bi bi-cloud-upload me-2"></i>
+                        Upload Subject Lines
+                    </h5>
+                </div>
+
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" id="uploadForm">
+                        {% csrf_token %}
+
+                        <!-- File Name Input -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-black">File Name</label>
+                            <input type="text" name="file_name" class="form-control theme-input"
+                                   placeholder="Enter file name" required>
+                        </div>
+
+                        <!-- File Upload Section -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-black">Select File</label>
+
+                            <div class="file-upload-area border-2 border-dashed rounded-3 p-3 text-center theme-dropzone">
+                                <i class="bi bi-cloud-arrow-up fs-2 text-black mb-2"></i>
+                                <p class="text-black-50 mb-2 small">Drag & drop or click to browse</p>
+                                <input type="file" name="file" class="form-control d-none"
+                                       id="fileInput" accept=".xlsx,.xls,.csv,.txt" required>
+                            </div>
+
+                            <div id="fileInfo" class="mt-2 d-none">
+                                <div class="alert alert-success py-2 small d-flex align-items-center theme-alert">
+                                    <i class="bi bi-check-circle-fill me-2"></i>
+                                    <span id="fileName"></span>
+                                </div>
+                            </div>
+
+                            <small class="form-text text-black-50">
+                                Supported: Excel (.xlsx, .xls), CSV (.csv), Text (.txt)
+                            </small>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2 mt-4">
+                            <a href="{% url 'content_studio' %}" class="btn btn-outline-secondary btn-sm theme-btn-secondary">
+                                <i class="bi bi-arrow-left me-1"></i>Back
+                            </a>
+
+                            <button type="submit" class="btn btn-primary btn-sm flex-fill theme-btn-primary">
+                                <i class="bi bi-upload me-1"></i>Upload File
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Theme Colors */
+:root {
+    --light-bg: #EFECE3;
+    --primary-soft: #8FABD4;
+    --primary-main: #4A70A9;
+    --black: #000;
+}
+
+/* Card */
+.theme-card {
+    background-color: var(--light-bg);
+    border-radius: 8px;
+}
+.theme-card-header {
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Inputs */
+.theme-input {
+    border-radius: 6px;
+    border: 1px solid var(--primary-soft);
+}
+.theme-input:focus {
+    border-color: var(--primary-main);
+    box-shadow: 0 0 0 0.2rem rgba(74,112,169,0.25);
+}
+
+/* Dropzone */
+.theme-dropzone {
+    background-color: #f4f2ec;
+    border-color: var(--primary-soft);
+    transition: 0.3s ease;
+    cursor: pointer;
+}
+.theme-dropzone:hover,
+.theme-dropzone.dragover {
+    border-color: var(--primary-main) !important;
+    background-color: #e4ebf6;
+}
+
+/* Alert */
+.theme-alert {
+    background-color: #d9f7d9;
+    color: #000;
+    border-radius: 6px;
+}
+
+/* Buttons */
+.theme-btn-primary {
+    background-color: var(--primary-main);
+    border-color: var(--primary-main);
+}
+.theme-btn-primary:hover {
+    background-color: #3b5b8a;
+}
+
+.theme-btn-secondary {
+    border-color: var(--primary-main);
+    color: var(--primary-main);
+}
+.theme-btn-secondary:hover {
+    background-color: var(--primary-main);
+    color: #fff;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('fileInput');
+    const fileUploadArea = document.querySelector('.file-upload-area');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+
+    fileUploadArea.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', e => {
+        if (e.target.files.length > 0) {
+            const file = e.target.files[0];
+            fileName.textContent = `Selected: ${file.name}`;
+            fileInfo.classList.remove('d-none');
+        }
+    });
+
+    fileUploadArea.addEventListener('dragover', e => {
+        e.preventDefault();
+        fileUploadArea.classList.add('dragover');
+    });
+
+    fileUploadArea.addEventListener('dragleave', () => {
+        fileUploadArea.classList.remove('dragover');
+    });
+
+    fileUploadArea.addEventListener('drop', e => {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+        fileInput.files = e.dataTransfer.files;
+
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            fileName.textContent = `Selected: ${file.name}`;
+            fileInfo.classList.remove('d-none');
+        }
+    });
+});
+</script>
+
+{% endblock %}
+
+
+
+{% comment %} {% extends "userhome.html" %}
+
+{% load static %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}
+{% endblock %}
+{% block top_campaigns %} {% endblock %}
+
+{% block main %}
+<div class="container-fluid py-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <!-- Upload Form Card -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-cloud-upload me-2"></i>
+                        Upload Subject Lines
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" id="uploadForm">
+                        {% csrf_token %}
+                        
+                        <!-- File Name Input -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">File Name</label>
+                            <input type="text" name="file_name" class="form-control" 
+                                   placeholder="Enter file name" required>
+                        </div>
+
+                        <!-- File Upload Section -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Select File</label>
+                            <div class="file-upload-area border-2 border-dashed rounded-3 p-3 text-center">
+                                <i class="bi bi-cloud-arrow-up fs-2 text-muted mb-2"></i>
+                                <p class="text-muted mb-2 small">Drag & drop or click to browse</p>
+                                <input type="file" name="file" class="form-control d-none" 
+                                       id="fileInput" accept=".xlsx,.xls,.csv,.txt" required>
+                            </div>
+                            <div id="fileInfo" class="mt-2 d-none">
+                                <div class="alert alert-success py-2 small d-flex align-items-center">
+                                    <i class="bi bi-check-circle-fill me-2"></i>
+                                    <span id="fileName"></span>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">
+                                Supported: Excel (.xlsx, .xls), CSV (.csv), Text (.txt)
+                            </small>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2 mt-4">
+                            <a href="{% url 'content_studio' %}" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-arrow-left me-1"></i>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-sm flex-fill">
+                                <i class="bi bi-upload me-1"></i>Upload File
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.file-upload-area {
+    border-color: #dee2e6;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.file-upload-area:hover {
+    border-color: #0d6efd;
+    background-color: #e7f1ff;
+}
+
+.file-upload-area.dragover {
+    border-color: #0d6efd;
+    background-color: #e7f1ff;
+}
+
+.border-dashed {
+    border-style: dashed !important;
+}
+
+.card {
+    border-radius: 8px;
+}
+
+.btn {
+    border-radius: 6px;
+}
+
+.alert {
+    border-radius: 6px;
+    border: none;
+    font-size: 0.875rem;
+}
+
+.form-control {
+    border-radius: 6px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('fileInput');
+    const fileUploadArea = document.querySelector('.file-upload-area');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+
+    fileUploadArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            const file = e.target.files[0];
+            fileName.textContent = `Selected: ${file.name}`;
+            fileInfo.classList.remove('d-none');
+        }
+    });
+
+    fileUploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        fileUploadArea.classList.add('dragover');
+    });
+
+    fileUploadArea.addEventListener('dragleave', function() {
+        fileUploadArea.classList.remove('dragover');
+    });
+
+    fileUploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+        fileInput.files = e.dataTransfer.files;
+        
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            fileName.textContent = `Selected: ${file.name}`;
+            fileInfo.classList.remove('d-none');
+        }
+    });
+});
+</script>
+{% endblock %} {% endcomment %}
+
+
+
+{% comment %} 
+<!-- templates/add_subject_line_file.html -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Upload Subject Line File</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label>File Name</label>
+                            <input type="text" name="file_name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Select File (Excel, CSV, or Text)</label>
+                            <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv,.txt" required>
+                            <small class="form-text text-muted">
+                                Supported formats: Excel (.xlsx, .xls), CSV (.csv), Text (.txt)
+                                <br>File should contain one subject line per row/first column
+                            </small>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Upload File</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
+ {% endcomment %}

@@ -1,11 +1,39 @@
 first run redis-server.exe  file 
 
+
+
+
 ngrok http 8000    exe file
 
+venv\Scripts\Activate
 cmd1 = python manage.py runserver
 
-cmd2 = celery -A keddy_mailer worker --pool=solo --loglevel=info
+cmd2:
+venv\Scripts\Activate
+celery -A keddy_mailer worker --pool=solo --loglevel=info
 
-cmd3 = celery -A keddy_mailer beat --loglevel=info
+cmd3 :
+venv\Scripts\Activate
+celery -A keddy_mailer beat --loglevel=info
 
 
+
+
+    user_id = request.session.get("user_id")
+    user = get_object_or_404(CustomUser, uid=user_id)
+    uname = request.session.get("name")
+    
+    credit_limit = user.email_credit_limit
+    used_credit = user.used_email_credit
+    credits_left = max(0, credit_limit - used_credit)
+    credit_percent = int((credits_left / credit_limit) * 100) if credit_limit > 0 else 0
+
+    context = {
+        "company_name": company_name,
+        "uname": uname,
+        "credits_left": credits_left,
+        "user": user,
+        "credit_limit": credit_limit,
+        "credit_percent": credit_percent,
+        
+    }

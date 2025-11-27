@@ -1,0 +1,234 @@
+{% extends "userhome.html" %}
+
+{% load static %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}
+{% endblock %}
+{% block top_campaigns %} {% endblock %}
+
+{% block main %}
+<div class="container">
+  <div class="row">
+    <!-- Template Card -->
+    <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 mb-3 mb-md-4">
+      <div class="summary-card">
+        <div class="card-header">
+          <span class="card-title">Email Templates</span>
+        </div>
+        <div class="card-actions">
+          <a href="/add_template/" class="action-btn">
+            <i class="bi bi-plus-circle"></i>
+            <span class="btn-text">Create Template</span>
+          </a>
+          <a href="/template_list/" class="action-btn">
+            <i class="bi bi-list"></i>
+            <span class="btn-text">View All Templates</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Subject Line Card -->
+    <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 mb-3 mb-md-4">
+      <div class="summary-card">
+        <div class="card-header">
+          <span class="card-title">Subject Lines</span>
+        </div>
+        <div class="card-actions">
+          <a href="/add_subject_line_file/" class="action-btn">
+            <i class="bi bi-upload"></i>
+            <span class="btn-text">Upload Subjects</span>
+          </a>
+          <a href="/subject_line_files/" class="action-btn">
+            <i class="bi bi-list"></i>
+            <span class="btn-text">View All Subjects</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  </div>
+</div>
+
+
+<style>
+.summary-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  border: 1px solid #e0e0e0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex: 1;
+  align-items: flex-start;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 16px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #495057;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-width: 120px;
+  justify-content: center;
+  text-align: center;
+}
+
+.action-btn:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+  color: #212529;
+}
+
+.bi {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.btn-text {
+  white-space: nowrap;
+}
+
+/* Mobile First Responsive Design */
+@media (max-width: 575.98px) {
+  .container {
+    padding: 0 10px;
+  }
+  
+  .summary-card {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .card-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .action-btn {
+    width: 100%;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+  
+  .card-title {
+    font-size: 15px;
+  }
+}
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .card-actions {
+    flex-direction: row;
+    gap: 8px;
+  }
+  
+  .action-btn {
+    flex: 1;
+    min-width: calc(50% - 8px);
+  }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .summary-card {
+    padding: 18px;
+  }
+  
+  .card-actions {
+    gap: 10px;
+  }
+  
+  .action-btn {
+    flex: 1;
+    min-width: calc(50% - 10px);
+  }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .summary-card {
+    padding: 20px;
+  }
+  
+  .action-btn {
+    flex: 1;
+    min-width: 140px;
+  }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  .summary-card {
+    padding: 25px;
+  }
+  
+  .action-btn {
+    flex: 1;
+    min-width: 150px;
+  }
+}
+
+/* Ensure proper spacing on all screen sizes */
+.row {
+  margin-left: -8px;
+  margin-right: -8px;
+}
+
+.col-12, .col-sm-12, .col-md-6, .col-lg-6, .col-xl-6 {
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 16px;
+}
+
+/* Prevent horizontal scroll on mobile */
+body {
+  overflow-x: hidden;
+}
+
+/* Touch device improvements */
+@media (hover: none) and (pointer: coarse) {
+  .action-btn {
+    padding: 12px 16px;
+    min-height: 44px;
+  }
+}
+</style>
+{% endblock %}

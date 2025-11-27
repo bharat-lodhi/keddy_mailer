@@ -1,21 +1,6 @@
-"""
-URL configuration for keddy_mailer project.
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 from django.conf import settings
@@ -24,6 +9,13 @@ from django.conf.urls.static import static
 urlpatterns = [
     
     path('',views.home ,),
+    
+     # ✅ FOLLOW-UP APP URLs ADD KAREIN
+    path('followups/', include('followups.urls')),
+    # -------------------------------------
+    
+    path('content_studio/',views.content_studio,name="content_studio"),
+   
     path('login/',views.login,name="login"),
     path('register/',views.register,name="register"),
     path('logout/',views.logout),
@@ -62,11 +54,19 @@ urlpatterns = [
     path("edit_user_profile/", views.edit_user_profile, name="edit_user_profile"),
     path("change_user_password/", views.change_user_password, name="change_user_password"),
     
-
     path("chat/", views.chat_page, name="chat_page"),
     path("send_message/", views.send_message, name="send_message"),
     path("fetch_messages/", views.fetch_messages, name="fetch_messages"),
-
+    
+            # ---NEW ----
+    path('campaign_detail/<int:campaign_id>/', views.campaign_detail, name='campaign_detail'),
+    
+    path('check_spam_score/', views.check_spam_score_api, name='check_spam_score'),
+    
+    path('add_subject_line_file/', views.add_subject_line_file, name='add_subject_line_file'),
+    path('subject_line_files/', views.subject_line_files_list, name='subject_line_files_list'),
+    path('delete_subject_line_file/<int:file_id>/', views.delete_subject_line_file, name='delete_subject_line_file'),
+    
     # # ---------------------- ADMIN URLS ---------------------------------------
     
     path("admin/chat/", views.admin_chat_panel, name="admin_chat_panel"),

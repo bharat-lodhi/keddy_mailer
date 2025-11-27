@@ -12,219 +12,303 @@
 {% endblock %}
 {% block top_campaigns %} {% endblock %}
 
-{% comment %} {% block main %}
+{% block topbar1 %}{% endblock %}
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-  <style>
+{% block main %}
 
-    :root {
-      --bg: #f1fcf7;
-      --label: #10b981;
-      --focus-shadow: rgba(16, 185, 129, 0.15);
-      --btn-gradient: linear-gradient(90deg, #0bab64, #3bb78f);
-    }
-
-    * { box-sizing: border-box; }
-
-    form {
-      max-width: 1100px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
-    }
-    .form-title {
-      font-size: 28px;
-      font-weight: bold;
-      margin-bottom: 30px;
-      text-align: center;
-      color: #0bab64
-    }
-    .form-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 10px;
-    }
-    .form-col {
-      flex: 1;
-      min-width: 280px;
-    }
-    .form-group {
-      position: relative;
-      margin-bottom: 20px;
-    }
-    .form-group input,
-    .form-group select {
-      width: 100%;
-      padding: 10px 10px;
-      font-size: 15px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      background: transparent;
-      outline: none;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    .form-group input:focus,
-    .form-group select:focus {
-      border-color: var(--label);
-      box-shadow: 0 0 0 3px var(--focus-shadow);
-    }
-    .form-group label {
-      position: absolute;
-      left: 10px;
-      top: 10px;
-      background: white;
-      padding: 0 5px;
-      color: #666;
-      transition: all 0.2s ease;
-      pointer-events: none;
-      font-size: 14px;
-    }
-    .form-group input:focus + label,
-    .form-group input:not(:placeholder-shown) + label,
-    .form-group select:focus + label,
-    .form-group select:valid + label {
-      top: -8px;
-      left: 8px;
-      font-size: 12px;
-      color: var(--label);
-    }
-    .input-group {
-      position: relative;
-    }
-    .input-group button {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: transparent;
-      border: none;
-      cursor: pointer;
-    }
-    .form-actions {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-top: 30px;
-    }
-    button {
-      padding: 10px 24px;
-      border: none;
-      font-size: 15px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .btn-secondary {
-      background: #e2e8f0;
-      color: #333;
-    }
-    .btn-success {
-      background: var(--btn-gradient);
-      color: white;
-    }
-    .btn-primary {
-      background: linear-gradient(90deg, #16a34a, #10b981);
-      color: white;
-    }
-    .btn-primary:hover,
-    .btn-success:hover {
-      opacity: 0.9;
-    }
-  </style>
+<style>
+  .form-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
   
-<form method="post">
-{% csrf_token %}
+  .form-header {
+    background: linear-gradient(135deg, #8FABD4 0%, #4A70A9 100%);
+    padding: 8px 20px;
+    border-bottom: 1px solid #8FABD4;
+  }
+  
+  .form-body {
+    padding: 24px;
+  }
+  
+  .form-footer {
+    background: #EFECE3;
+    padding: 16px 24px;
+    border-top: 1px solid #8FABD4;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .form-label {
+    font-weight: 600;
+    color: #000000;
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  
+  .form-control, .form-select {
+    border: 1px solid #8FABD4;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background-color: #ffffff;
+    color: #000000;
+  }
+  
+  .form-control:focus, .form-select:focus {
+    border-color: #4A70A9;
+    box-shadow: 0 0 0 3px rgba(74, 112, 169, 0.1);
+    outline: none;
+  }
+  
+  .form-control::placeholder {
+    color: #8FABD4;
+    opacity: 0.7;
+  }
+  
+  .btn-secondary {
+    background: #8FABD4;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    color: #000000;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  
+  .btn-secondary:hover {
+    background: #4A70A9;
+    transform: translateY(-1px);
+    color: #ffffff;
+    text-decoration: none;
+  }
+  
+  .btn-primary-custom {
+    background: linear-gradient(135deg, #8FABD4 0%, #4A70A9 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-weight: 500;
+    color: #ffffff;
+    min-width: 140px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(143, 171, 212, 0.3);
+  }
+  
+  .btn-primary-custom:hover {
+    background: linear-gradient(135deg, #4A70A9 0%, #3a5c8f 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(143, 171, 212, 0.4);
+    color: #ffffff;
+  }
+  
+  .input-group {
+    display: flex;
+  }
+  
+  .input-group .form-control {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    flex: 1;
+  }
+  
+  .input-group .btn {
+    border: 1px solid #8FABD4;
+    border-left: none;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    background: #EFECE3;
+    color: #4A70A9;
+    padding: 10px 14px;
+  }
+  
+  .input-group .btn:hover {
+    background: #8FABD4;
+    color: #ffffff;
+  }
+  
+  .alert {
+    border-radius: 8px;
+    border: none;
+    padding: 12px 16px;
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+  
+  .alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border-left: 4px solid #10b981;
+  }
+  
+  .alert-danger {
+    background: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+  }
+  
+  .row.g-3 {
+    margin: 0 -12px;
+  }
+  
+  .row.g-3 > [class*="col-"] {
+    padding: 0 12px;
+  }
+  
+  /* Custom form enhancements */
+  .form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%234A70A9' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 16px 12px;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .form-body {
+      padding: 20px;
+    }
+    
+    .form-footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .form-footer a, 
+    .form-footer button {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .btn-primary-custom {
+      min-width: auto;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .form-body {
+      padding: 16px;
+    }
+    
+    .form-header {
+      padding: 10px 20px;
+    }
+    
+    .form-header h5 {
+      font-size: 18px;
+    }
+  }
+</style>
 
-{% if messages %}
-  <div style="margin-bottom: 20px;">
-    {% for message in messages %}
-      <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
-           role="alert" 
-           style="border-radius: 8px; font-weight: 500;">
-        {{ message }}
+<div class="form-card">
+  <div class="form-header text-white">
+    <h5 class="mb-0"><i class="bi bi-server me-2"></i>Add Email Server</h5>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+
+    {% if messages %}
+      <div class="p-3">
+        {% for message in messages %}
+          <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
+               role="alert">
+            <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %} me-2"></i>
+            {{ message }}
+          </div>
+        {% endfor %}
       </div>
-    {% endfor %}
-  </div>
-{% endif %}
+    {% endif %}
 
-<div class="form-title">Add Email Server</div>
+    <div class="form-body">
+      <div class="row g-3">
 
-  <div class="form-row">
-    <div class="form-col form-group">
-      <input type="text" name="name" placeholder=" " required>
-      <label>Server Name</label>
-    </div>
-    <div class="form-col form-group">
-      <input type="text" name="from_email" placeholder=" " required>
-      <label>From Email</label>
-    </div>
-  </div>
+        <div class="col-md-6">
+          <label class="form-label">Server Name</label>
+          <input type="text" name="name" class="form-control" placeholder="Enter server name" required>
+        </div>
 
-  <div class="form-row">
-    <div class="form-col form-group">
-      <input type="text" name="host" placeholder=" " required>
-      <label>SMTP Host</label>
-    </div>
-    <div class="form-col form-group">
-      <input type="number" name="emails_per_hour" placeholder=" " required>
-      <label>Emails Per Hour</label>
-    </div>
-  </div>
+        <div class="col-md-6">
+          <label class="form-label">From Email</label>
+          <input type="text" name="from_email" class="form-control" placeholder="Enter from email address" required>
+        </div>
 
-  <div class="form-row">
-    <div class="form-col form-group">
-      <input type="text" name="smtp_server" placeholder=" " required>
-      <label>SMTP Server</label>
-    </div>
-    <div class="form-col form-group">
-      <input type="text" name="username" placeholder=" " required>
-      <label>Username</label>
-    </div>
-  </div>
+        <div class="col-md-6">
+          <label class="form-label">SMTP Host</label>
+          <input type="text" name="host" class="form-control" placeholder="Enter SMTP host" required>
+        </div>
 
-  <div class="form-row">
-    <div class="form-col form-group input-group">
-      <input type="password" id="smtpPassword" name="password" placeholder=" " required>
-      <label>Password</label>
-      <button type="button" onclick="toggleVisibility('smtpPassword', this)">
-        <i class="bi bi-eye"></i>
+        <div class="col-md-6">
+          <label class="form-label">Emails Per Hour</label>
+          <input type="number" name="emails_per_hour" class="form-control" placeholder="Enter email limit per hour" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">SMTP Server</label>
+          <input type="text" name="smtp_server" class="form-control" placeholder="Enter SMTP server" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Username</label>
+          <input type="text" name="username" class="form-control" placeholder="Enter username" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Password</label>
+          <div class="input-group">
+            <input type="password" name="password" id="smtpPassword" class="form-control" placeholder="Enter password" required>
+            <button type="button" class="btn btn-outline-secondary" onclick="toggleVisibility('smtpPassword', this)">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Port</label>
+          <select name="port" class="form-select" required>
+            <option value="" disabled selected>Select Port</option>
+            <option value="25">25</option>
+            <option value="587">587</option>
+            <option value="465">465</option>
+            <option value="2525">2525</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Security</label>
+          <select name="security" class="form-select" required>
+            <option value="" disabled selected>Select Security</option>
+            <option value="TLS">TLS</option>
+            <option value="SSL">SSL</option>
+            <option value="none">None</option>
+          </select>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <a href="/userhome/" class="btn btn-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Cancel
+      </a>
+      <button type="submit" class="btn btn-primary-custom">
+        <i class="bi bi-check-circle me-1"></i> Verify & Save
       </button>
     </div>
-    <div class="form-col form-group">
-      <select name="port" required>
-        <option value="" disabled selected hidden></option>
-        <option value="25">25</option>
-        <option value="587">587</option>
-        <option value="465">465</option>
-      </select>
-      <label>Port</label>
-    </div>
-  </div>
-
-  <div class="form-row">
-    <div class="form-col form-group">
-      <select name="security" required>
-        <option value="" disabled selected hidden></option>
-        <option value="TLS">TLS</option>
-        <option value="SSL">SSL</option>
-        <option value="none">None</option>
-      </select>
-      <label>Security</label>
-    </div>
-  </div>
-
-  <div class="form-actions">
-    <a href="/userhome/"><button type="button" class="btn-secondary">Cancel</button></a>
-    <div>
-      <button type="submit" class="btn-success">Verify & Save </button>
-    </div>
-  </div>
-</form>
+  </form>
+</div>
 
 <script>
   function toggleVisibility(id, btn) {
@@ -232,17 +316,373 @@
     if (input.type === "password") {
       input.type = "text";
       btn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+      btn.setAttribute('aria-label', 'Hide password');
     } else {
       input.type = "password";
       btn.innerHTML = '<i class="bi bi-eye"></i>';
+      btn.setAttribute('aria-label', 'Show password');
     }
   }
+  
+  // Add focus styles for better accessibility
+  document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('input, select');
+    inputs.forEach(input => {
+      input.addEventListener('focus', function() {
+        this.parentElement.classList.add('focused');
+      });
+      input.addEventListener('blur', function() {
+        this.parentElement.classList.remove('focused');
+      });
+    });
+  });
 </script>
+{% endblock %}
 
+
+{% comment %} {% extends "userhome.html" %}
+
+{% load static %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}
+{% endblock %}
+{% block top_campaigns %} {% endblock %}
+
+{% block main %}
+
+<style>
+  .form-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+  }
+  
+  .form-header {
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+    padding: 8px 20px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .form-body {
+    padding: 24px;
+  }
+  
+  .form-footer {
+    background: #f8fafc;
+    padding: 16px 24px;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .form-label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  
+  .form-control, .form-select {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background-color: #ffffff;
+  }
+  
+  .form-control:focus, .form-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+  }
+  
+  .btn-secondary {
+    background: #6b7280;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    color: white;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  
+  .btn-secondary:hover {
+    background: #4b5563;
+    transform: translateY(-1px);
+    color: white;
+    text-decoration: none;
+  }
+  
+  .btn-primary-custom {
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-weight: 500;
+    color: white;
+    min-width: 140px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(59, 130, 246, 0.3);
+  }
+  
+  .btn-primary-custom:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+    color: white;
+  }
+  
+  .input-group {
+    display: flex;
+  }
+  
+  .input-group .form-control {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    flex: 1;
+  }
+  
+  .input-group .btn {
+    border: 1px solid #d1d5db;
+    border-left: none;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    background: #f9fafb;
+    color: #6b7280;
+    padding: 10px 14px;
+  }
+  
+  .input-group .btn:hover {
+    background: #f3f4f6;
+    color: #374151;
+  }
+  
+  .alert {
+    border-radius: 8px;
+    border: none;
+    padding: 12px 16px;
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+  
+  .alert-success {
+    background: #d1fae5;
+    color: #065f46;
+  }
+  
+  .alert-danger {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+  
+  .row.g-3 {
+    margin: 0 -12px;
+  }
+  
+  .row.g-3 > [class*="col-"] {
+    padding: 0 12px;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .form-body {
+      padding: 20px;
+    }
+    
+    .form-footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .form-footer a, 
+    .form-footer button {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .btn-primary-custom {
+      min-width: auto;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .form-body {
+      padding: 16px;
+    }
+    
+    .form-header {
+      padding: 10px 20px;
+    }
+    
+    .form-header h5 {
+      font-size: 18px;
+    }
+  }
+</style>
+
+<div class="form-card">
+  <div class="form-header text-white">
+    <h5 class="mb-0"><i class="bi bi-server me-2"></i>Add Email Server</h5>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+
+    {% if messages %}
+      <div class="p-3">
+        {% for message in messages %}
+          <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
+               role="alert">
+            <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %} me-2"></i>
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="form-body">
+      <div class="row g-3">
+
+        <div class="col-md-6">
+          <label class="form-label">Server Name</label>
+          <input type="text" name="name" class="form-control" placeholder="Enter server name" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">From Email</label>
+          <input type="text" name="from_email" class="form-control" placeholder="Enter from email address" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">SMTP Host</label>
+          <input type="text" name="host" class="form-control" placeholder="Enter SMTP host" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Emails Per Hour</label>
+          <input type="number" name="emails_per_hour" class="form-control" placeholder="Enter email limit per hour" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">SMTP Server</label>
+          <input type="text" name="smtp_server" class="form-control" placeholder="Enter SMTP server" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Username</label>
+          <input type="text" name="username" class="form-control" placeholder="Enter username" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Password</label>
+          <div class="input-group">
+            <input type="password" name="password" id="smtpPassword" class="form-control" placeholder="Enter password" required>
+            <button type="button" class="btn btn-outline-secondary" onclick="toggleVisibility('smtpPassword', this)">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Port</label>
+          <select name="port" class="form-select" required>
+            <option value="" disabled selected>Select Port</option>
+            <option value="25">25</option>
+            <option value="587">587</option>
+            <option value="465">465</option>
+            <option value="2525">2525</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Security</label>
+          <select name="security" class="form-select" required>
+            <option value="" disabled selected>Select Security</option>
+            <option value="TLS">TLS</option>
+            <option value="SSL">SSL</option>
+            <option value="none">None</option>
+          </select>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <a href="/userhome/" class="btn btn-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Cancel
+      </a>
+      <button type="submit" class="btn btn-primary-custom">
+        <i class="bi bi-check-circle me-1"></i> Verify & Save
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function toggleVisibility(id, btn) {
+    const input = document.getElementById(id);
+    if (input.type === "password") {
+      input.type = "text";
+      btn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+      btn.setAttribute('aria-label', 'Hide password');
+    } else {
+      input.type = "password";
+      btn.innerHTML = '<i class="bi bi-eye"></i>';
+      btn.setAttribute('aria-label', 'Show password');
+    }
+  }
+  
+  // Add focus styles for better accessibility
+  document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('input, select');
+    inputs.forEach(input => {
+      input.addEventListener('focus', function() {
+        this.parentElement.classList.add('focused');
+      });
+      input.addEventListener('blur', function() {
+        this.parentElement.classList.remove('focused');
+      });
+    });
+  });
+</script>
 {% endblock %} {% endcomment %}
 
 
 
+
+
+
+
+{% comment %} {% extends "userhome.html" %}
+
+{% load static %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}
+{% endblock %}
+{% block top_campaigns %} {% endblock %}
 
 {% block main %}
 
@@ -315,6 +755,7 @@
           <option value="25">25</option>
           <option value="587">587</option>
           <option value="465">465</option>
+          <option value="2525">2525</option>
         </select>
       </div>
 
@@ -332,7 +773,6 @@
 
     <div class="card-footer d-flex justify-content-between flex-wrap">
       <a href="/userhome/" class="btn btn-secondary">← Cancel</a>
-      {% comment %} <button type="submit" class="btn btn-success">Verify & Save</button> {% endcomment %}
       <button type="submit" 
         class="btn" 
         style="background-color: #37AFE1; color: white; min-width: 120px; height: 40px; padding: 8px 20px; font-size: 16px; border: none;">
@@ -354,4 +794,4 @@
     }
   }
 </script>
-{% endblock %}
+{% endblock %} {% endcomment %}

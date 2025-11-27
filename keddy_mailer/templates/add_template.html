@@ -13,228 +13,549 @@
 
 {% block outermain %}{% endblock %}
 {% block main %} {% endblock %}
-{% comment %} {% block top_campaigns %} {% endblock %} {% endcomment %}
+{% block topbar1 %}{% endblock %}
 
-{% comment %} {% block main %}
-<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
+{% block top_campaigns %}
 
 <style>
-  :root {
-    --primary-color: #10b981;
-    --primary-hover: #0e9e72;
-    --border-color: #b8bdbb;
-    --text-color: #1e293b;
-    --bg-light: #f0fdf4;
-    --transition: 0.3s ease;
-    --border-radius: 8px;
+  .form-container {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    margin-bottom: 24px;
   }
-
-.custom-form-container {
-  background: white;
-  max-width: 1100px;
-  padding: 30px;
-  border-radius: var(--border-radius);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-  h2 {
-    color: var(--primary-color);
-    text-align: center;
-    margin-bottom: 30px;
-    font-weight: 600;
+  
+  .form-floating {
+    margin-bottom: 20px;
   }
-
-  #heading1{
-    font-weight:bold;
-  }
-
-  .form-group {
-    position: relative;
-    margin-bottom: 25px;
-  }
-
-  .form-group input,
-  .form-group select {
-    width: 100%;
-    padding: 12px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    font-size: 15px;
-    background: transparent;
-    color: var(--text-color);
-    transition: var(--transition);
-  }
-
-  .form-group select {
-    appearance: none;
-    background-color: white;
-  }
-
-  .form-group label {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background: white;
-    padding: 0 6px;
-    color: #6b7280;
+  
+  .form-control, .form-select {
+    border: 1px solid #8FABD4;
+    border-radius: 8px;
+    padding: 12px 16px;
     font-size: 14px;
-    transition: 0.2s ease;
-    pointer-events: none;
+    transition: all 0.2s;
+    background-color: #ffffff;
+    color: #000000;
   }
-
-  .form-group input:focus + label,
-  .form-group input:not(:placeholder-shown) + label,
-  .form-group select:focus + label,
-  .form-group select:not([value=""]) + label {
-    top: -10px;
-    left: 8px;
-    font-size: 12px;
-    color: var(--primary-color);
-  }
-
-  .form-group input:focus,
-  .form-group select:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  
+  .form-control:focus, .form-select:focus {
+    border-color: #4A70A9;
+    box-shadow: 0 0 0 3px rgba(74, 112, 169, 0.1);
     outline: none;
   }
-
-  /* ✳️ CKEditor Section: Keep as original */
-  textarea {
-    width: 100%;
-    height: 300px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-family: sans-serif;
-  }
-
-  .btn-group {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 20px;
-  }
-
-  .btn1 {
-    padding: 12px 22px;
-    border: none;
-    border-radius: var(--border-radius);
-    cursor: pointer;
+  
+  .form-label {
     font-weight: 600;
-    font-size: 15px;
-    transition: var(--transition);
+    color: #000000;
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: block;
   }
-
-  .btn-save {
-    background-color: var(--primary-color);
-    color: white;
+  
+  .form-control::placeholder {
+    color: #8FABD4;
+    opacity: 0.7;
   }
-
-  .btn-save:hover {
-    background-color: var(--primary-hover);
+  
+  .btn-primary-custom {
+    background: linear-gradient(135deg, #8FABD4 0%, #4A70A9 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-weight: 500;
+    color: #ffffff;
+    min-width: 140px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(143, 171, 212, 0.3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
-
-  .btn-cancel {
-    background-color: #e5e7eb;
-    color: var(--text-color);
+  
+  .btn-primary-custom:hover {
+    background: linear-gradient(135deg, #4A70A9 0%, #3a5c8f 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(143, 171, 212, 0.4);
+    color: #ffffff;
   }
-
-  @media (max-width: 600px) {
-    .btn-group {
+  
+  .btn-secondary {
+    background: #8FABD4;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-weight: 500;
+    color: #000000;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    min-width: 140px;
+    justify-content: center;
+  }
+  
+  .btn-secondary:hover {
+    background: #4A70A9;
+    transform: translateY(-1px);
+    color: #ffffff;
+    text-decoration: none;
+  }
+  
+  .spam-checker-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #8FABD4;
+    overflow: hidden;
+    margin: 24px 0;
+  }
+  
+  .spam-checker-header {
+    background: linear-gradient(135deg, #EFECE3 0%, #8FABD4 100%);
+    padding: 12px 20px;
+    border-bottom: 1px solid #8FABD4;
+  }
+  
+  .spam-checker-body {
+    padding: 20px;
+    background: #EFECE3;
+  }
+  
+  .btn-warning-custom {
+    background: linear-gradient(135deg, #EFECE3 0%, #8FABD4 100%);
+    border: 1px solid #8FABD4;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-weight: 500;
+    color: #000000;
+    transition: all 0.2s;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .btn-warning-custom:hover {
+    background: linear-gradient(135deg, #8FABD4 0%, #4A70A9 100%);
+    border-color: #4A70A9;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(143, 171, 212, 0.3);
+  }
+  
+  .btn-outline-custom {
+    background: #ffffff;
+    border: 1px solid #8FABD4;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-weight: 500;
+    color: #4A70A9;
+    transition: all 0.2s;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .btn-outline-custom:hover {
+    background: #8FABD4;
+    border-color: #4A70A9;
+    color: #ffffff;
+    transform: translateY(-1px);
+  }
+  
+  .alert {
+    border-radius: 8px;
+    border: none;
+    padding: 16px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    border-left: 4px solid;
+  }
+  
+  .alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border-left-color: #10b981;
+  }
+  
+  .alert-danger {
+    background: #fee2e2;
+    color: #991b1b;
+    border-left-color: #ef4444;
+  }
+  
+  .alert-warning {
+    background: #fef3c7;
+    color: #92400e;
+    border-left-color: #f59e0b;
+  }
+  
+  .alert-info {
+    background: #dbeafe;
+    color: #1e40af;
+    border-left-color: #3b82f6;
+  }
+  
+  .badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 12px;
+  }
+  
+  .text-muted {
+    color: #8FABD4 !important;
+  }
+  
+  /* CKEditor customizations */
+  .cke_top {
+    background: #EFECE3 !important;
+    border-bottom: 1px solid #8FABD4 !important;
+  }
+  
+  .cke_bottom {
+    background: #EFECE3 !important;
+    border-top: 1px solid #8FABD4 !important;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .form-container {
+      padding: 20px;
+    }
+    
+    .spam-checker-body {
+      padding: 16px;
+    }
+    
+    .btn-primary-custom,
+    .btn-secondary {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    
+    .action-buttons {
       flex-direction: column;
-      align-items: stretch;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .form-container {
+      padding: 16px;
+    }
+    
+    .spam-checker-header {
+      padding: 10px 16px;
+    }
+    
+    .spam-checker-header h5 {
+      font-size: 16px;
+    }
+    
+    .btn-warning-custom,
+    .btn-outline-custom {
+      padding: 10px 16px;
+      font-size: 14px;
     }
   }
 </style>
 
-<div class="custom-form-container">
-
+<div class="form-container">
   {% if messages %}
   <div style="margin-bottom: 20px;">
     {% for message in messages %}
-      <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
-           role="alert" 
-           style="border-radius: 8px; font-weight: 500;">
+      <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" role="alert">
+        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-triangle{% endif %} me-2"></i>
         {{ message }}
       </div>
     {% endfor %}
   </div>
-{% endif %}
+  {% endif %}
 
-  <h2 id="heading1">Create Email Template</h2>
-  <form id="templateForm" method="post">
+  <form method="post">
     {% csrf_token %}
-
-    <!-- Template Name -->
-    <div class="form-group">
-      <input type="text" id="templateName" name="template_name" placeholder=" " required>
-      <label for="templateName">Name *</label>
+    
+    <div class="form-floating">
+      <input type="text" name="template_name" class="form-control" placeholder=" " required>
+      <label>Template Name</label>
     </div>
 
-    <!-- Category -->
-    <div class="form-group">
-      <select id="category" name="category">
-        <option value="" selected disabled hidden></option>
+    <div class="mb-4">
+      <label class="form-label">Category</label>
+      <select name="category" class="form-select" required>
+        <option value="" selected disabled>Select Category</option>
         <option value="Promotional">Promotional</option>
         <option value="Transactional">Transactional</option>
         <option value="Newsletter">Newsletter</option>
       </select>
-      <label for="category">Category</label>
     </div>
 
-    <!-- CKEditor Textarea (unchanged) -->
-    <div class="form-group">
-      <label for="editor" style="position: static; font-weight: bold; margin-bottom: 6px;">Content *</label>
-      <textarea name="content" id="editor"></textarea>
+    <div class="mb-4">
+      <label class="form-label">Content *</label>
+      <textarea name="content" id="templateContent"></textarea>
     </div>
 
-    <!-- Buttons -->
-    <div class="btn-group">
-      <button type="submit" class="btn btn-save btn1">Save</button>
-      <button type="button" class="btn btn-cancel btn1" onclick="window.history.back()">Cancel</button>
+    <!-- Spam Checker Section -->
+    <div class="spam-checker-card">
+      <div class="spam-checker-header">
+        <h5 class="mb-0">
+          <i class="fas fa-shield-alt me-2"></i> Spam Score Checker
+        </h5>
+      </div>
+      <div class="spam-checker-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <button type="button" id="checkSpamBtn" class="btn btn-warning-custom">
+              <i class="fas fa-search me-2"></i> Check Spam Score
+            </button>
+          </div>
+          <div class="col-md-6">
+            <button type="button" id="clearSpamResult" class="btn btn-outline-custom">
+              <i class="fas fa-times me-2"></i> Clear Result
+            </button>
+          </div>
+        </div>
+        
+        <div id="spamResult" class="mt-3"></div>
+        
+        <div class="mt-3">
+          <small class="text-muted">
+            <i class="fas fa-info-circle me-1"></i> 
+            Check your template for spam patterns before saving. Lower scores have better email deliverability.
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 action-buttons d-flex gap-3 flex-wrap">
+      <button type="submit" class="btn btn-primary-custom">
+        <i class="fas fa-save me-2"></i> Save Template
+      </button>
+      
+      <a href="{% url 'template_list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i> Back to List
+      </a>
     </div>
   </form>
 </div>
 
+<!-- Use Full CKEditor Build -->
+<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
 <script>
-  CKEDITOR.replace('editor');
-</script>
-{% endblock %} {% endcomment %}
-
-
-{% comment %} {% block top_campaigns %}
-<form method="post">
-  {% csrf_token %}
-  <div class="form-floating mb-4">
-    <input type="text" name="template_name" class="form-control" placeholder=" " required>
-    <label>Template Name</label>
-  </div>
-
-  <div class="mb-4">
-    <label>Category</label>
-    <select name="category" class="form-select">
-      <option value="" selected disabled>Select Category</option>
-        <option value="Promotional">Promotional</option>
-        <option value="Transactional">Transactional</option>
-        <option value="Newsletter">Newsletter</option>
-    </select>
-  </div>
-
-  <div class="mb-4">
-    <textarea name="content" id="templateContent"></textarea>
-  </div>
-
-  <button type="submit" class="btn btn-success">Add Template</button>
-</form>
-
-<script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
-<script>
-  CKEDITOR.replace('templateContent');
+  // Initialize CKEditor
+  var editor = CKEDITOR.replace('templateContent', {
+    height: 300,
+    removePlugins: 'elementspath',
+    resize_enabled: true,
+    toolbarCanCollapse: true,
+    contentsCss: 'body { color: #000000; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }'
+  });
 </script>
 
-{% endblock %} {% endcomment %}
+<!-- jQuery for AJAX -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Main spam check button
+    $('#checkSpamBtn').click(function() {
+        checkSpamScore();
+    });
+    
+    // Clear result button
+    $('#clearSpamResult').click(function() {
+        $('#spamResult').html('');
+    });
+    
+    // Enter key trigger for template name field
+    $('input[name="template_name"]').keypress(function(e) {
+        if(e.which == 13) { // Enter key
+            e.preventDefault();
+            checkSpamScore();
+        }
+    });
+    
+    function checkSpamScore() {
+        var templateName = $('input[name="template_name"]').val();
+        var templateContent = editor.getData(); // Get CKEditor content
+        
+        // Basic validation
+        if (!templateContent || templateContent.trim() === '') {
+            showSpamResult('error', 'Please enter template content first');
+            return;
+        }
+        
+        if (!templateName) {
+            templateName = "Unnamed Template";
+        }
+        
+        // Show loading
+        $('#spamResult').html(`
+            <div class="alert alert-info">
+                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                Analyzing template for spam patterns...
+                <div class="mt-2 small">Checking for spam keywords, suspicious patterns, and deliverability issues...</div>
+            </div>
+        `);
+        
+        // AJAX request to check spam score
+        $.ajax({
+            url: '/check_spam_score/',
+            type: 'POST',
+            data: {
+                'subject': templateName,
+                'body': templateContent,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    showSpamResult('success', response);
+                } else {
+                    showSpamResult('error', response.error || 'Spam analysis failed');
+                }
+            },
+            error: function(xhr, status, error) {
+                showSpamResult('error', 'Server error: ' + error);
+            }
+        });
+    }
+    
+    function showSpamResult(type, data) {
+        if (type === 'error') {
+            $('#spamResult').html(`
+                <div class="alert alert-danger">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Error</h6>
+                    <p class="mb-0">${data}</p>
+                </div>
+            `);
+            return;
+        }
+        
+        // Determine alert class and badge based on risk level
+        var alertClass = 'alert-' + data.risk_color;
+        var riskIcon = '';
+        var riskText = '';
+        
+        switch(data.risk_color) {
+            case 'danger':
+                riskIcon = '🚨';
+                riskText = 'HIGH RISK - Likely to be marked as spam';
+                break;
+            case 'warning':
+                riskIcon = '⚠️';
+                riskText = 'MEDIUM RISK - May affect deliverability';
+                break;
+            case 'info':
+                riskIcon = 'ℹ️';
+                riskText = 'LOW RISK - Generally safe';
+                break;
+            default:
+                riskIcon = '✅';
+                riskText = 'SAFE - Good deliverability';
+        }
+        
+        // Build suggestions HTML
+        var suggestionsHtml = '';
+        if (data.suggestions && data.suggestions.length > 0) {
+            suggestionsHtml = `
+                <div class="mt-3">
+                    <h6><i class="fas fa-lightbulb text-warning"></i> Improvement Suggestions:</h6>
+                    <div class="small">
+                        <ul class="mb-0">
+                            ${data.suggestions.map(s => `<li>${s}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Build detected patterns HTML
+        var patternsHtml = '';
+        if (data.detected_patterns && data.detected_patterns.length > 0) {
+            var uniquePatterns = [...new Set(data.detected_patterns.map(p => p.category))];
+            patternsHtml = `
+                <div class="mt-3">
+                    <h6><i class="fas fa-exclamation-triangle text-danger"></i> Detected Spam Patterns:</h6>
+                    <div class="small">
+                        ${uniquePatterns.map(pattern => 
+                            `<span class="badge bg-danger me-1 mb-1">${pattern}</span>`
+                        ).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Final HTML result
+        var html = `
+            <div class="alert ${alertClass}">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="mb-1">${riskIcon} Spam Score: <strong>${data.spam_probability}%</strong></h5>
+                        <p class="mb-2">${riskText}</p>
+                    </div>
+                    <span class="badge bg-${data.risk_color} fs-6">${data.spam_level}</span>
+                </div>
+                
+                ${patternsHtml}
+                ${suggestionsHtml}
+                
+                <div class="mt-3 pt-2 border-top">
+                    <small class="text-muted">
+                        <i class="fas fa-chart-line"></i> 
+                        <strong>Spam Score Guide:</strong> 
+                        <span class="text-success">0-40% (Safe)</span> | 
+                        <span class="text-info">41-60% (Low Risk)</span> | 
+                        <span class="text-warning">61-80% (Medium Risk)</span> | 
+                        <span class="text-danger">81-100% (High Risk)</span>
+                    </small>
+                </div>
+            </div>
+        `;
+        
+        $('#spamResult').html(html);
+    }
+    
+    // Auto-check when content is substantial
+    let checkTimeout;
+    editor.on('change', function() {
+        clearTimeout(checkTimeout);
+        var content = editor.getData();
+        // Auto-check only if content is substantial (> 50 characters)
+        if (content.length > 50) {
+            checkTimeout = setTimeout(function() {
+                // Optional: Auto-check after 3 seconds of inactivity
+                // checkSpamScore();
+            }, 3000);
+        }
+    });
+});
+</script>
+{% endblock %}
 
 
+
+{% comment %} {% extends "userhome.html" %}
+
+{% load static %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}
+{% endblock %}
+
+{% block outermain %}{% endblock %}
+{% block main %} {% endblock %}
 
 {% block top_campaigns %}
 
@@ -272,7 +593,346 @@
     <textarea name="content" id="templateContent"></textarea>
   </div>
 
-  {% comment %} <button type="submit" class="btn btn-success">Add Template</button> {% endcomment %}
+  <!-- 🚀 SPAM CHECK BUTTON SECTION -->
+  <div class="card mt-4 border-warning">
+    <div class="card-header bg-warning text-dark">
+      <h5 class="mb-0">
+        <i class="fas fa-shield-alt"></i> Spam Score Checker
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <button type="button" id="checkSpamBtn" class="btn btn-warning btn-lg w-100 mb-2">
+            <i class="fas fa-search"></i> Check Spam Score
+          </button>
+        </div>
+        <div class="col-md-6">
+          <button type="button" id="clearSpamResult" class="btn btn-outline-secondary btn-lg w-100 mb-2">
+            <i class="fas fa-times"></i> Clear Result
+          </button>
+        </div>
+      </div>
+      
+      <div id="spamResult" class="mt-3"></div>
+      
+      <div class="mt-3">
+        <small class="text-muted">
+          <i class="fas fa-info-circle"></i> 
+          Check your template for spam patterns before saving. Lower scores have better email deliverability.
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <button type="submit" 
+            class="btn me-3" 
+            style="background-color: #37AFE1; color: white; min-width: 120px; height: 40px; padding: 8px 20px; font-size: 16px; border: none;">
+      <i class="fas fa-save"></i> Save Template
+    </button>
+    
+    <a href="{% url 'template_list' %}" class="btn btn-outline-secondary" 
+       style="min-width: 120px; height: 40px; padding: 8px 20px; font-size: 16px;">
+      <i class="fas fa-arrow-left"></i> Back to List
+    </a>
+  </div>
+</form>
+
+<!-- Use Full CKEditor Build -->
+<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
+<script>
+  // Initialize CKEditor
+  var editor = CKEDITOR.replace('templateContent', {
+    height: 200,
+    removePlugins: 'elementspath',
+    resize_enabled: true,
+    toolbarCanCollapse: true
+  });
+</script>
+
+<!-- jQuery for AJAX -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Main spam check button
+    $('#checkSpamBtn').click(function() {
+        checkSpamScore();
+    });
+    
+    // Clear result button
+    $('#clearSpamResult').click(function() {
+        $('#spamResult').html('');
+    });
+    
+    // Enter key trigger for template name field
+    $('input[name="template_name"]').keypress(function(e) {
+        if(e.which == 13) { // Enter key
+            e.preventDefault();
+            checkSpamScore();
+        }
+    });
+    
+    function checkSpamScore() {
+        var templateName = $('input[name="template_name"]').val();
+        var templateContent = editor.getData(); // Get CKEditor content
+        
+        // Basic validation
+        if (!templateContent || templateContent.trim() === '') {
+            showSpamResult('error', 'Please enter template content first');
+            return;
+        }
+        
+        if (!templateName) {
+            templateName = "Unnamed Template";
+        }
+        
+        // Show loading
+        $('#spamResult').html(`
+            <div class="alert alert-info">
+                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                Analyzing template for spam patterns...
+                <div class="mt-2 small">Checking for spam keywords, suspicious patterns, and deliverability issues...</div>
+            </div>
+        `);
+        
+        // AJAX request to check spam score
+        $.ajax({
+            url: '/check_spam_score/',  // ✅ YEH URL ADD KARNA HAI
+            type: 'POST',
+            data: {
+                'subject': templateName,
+                'body': templateContent,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    showSpamResult('success', response);
+                } else {
+                    showSpamResult('error', response.error || 'Spam analysis failed');
+                }
+            },
+            error: function(xhr, status, error) {
+                showSpamResult('error', 'Server error: ' + error);
+            }
+        });
+    }
+    
+    function showSpamResult(type, data) {
+        if (type === 'error') {
+            $('#spamResult').html(`
+                <div class="alert alert-danger">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Error</h6>
+                    <p class="mb-0">${data}</p>
+                </div>
+            `);
+            return;
+        }
+        
+        // Determine alert class and badge based on risk level
+        var alertClass = 'alert-' + data.risk_color;
+        var riskIcon = '';
+        var riskText = '';
+        
+        switch(data.risk_color) {
+            case 'danger':
+                riskIcon = '🚨';
+                riskText = 'HIGH RISK - Likely to be marked as spam';
+                break;
+            case 'warning':
+                riskIcon = '⚠️';
+                riskText = 'MEDIUM RISK - May affect deliverability';
+                break;
+            case 'info':
+                riskIcon = 'ℹ️';
+                riskText = 'LOW RISK - Generally safe';
+                break;
+            default:
+                riskIcon = '✅';
+                riskText = 'SAFE - Good deliverability';
+        }
+        
+        // Build suggestions HTML
+        var suggestionsHtml = '';
+        if (data.suggestions && data.suggestions.length > 0) {
+            suggestionsHtml = `
+                <div class="mt-3">
+                    <h6><i class="fas fa-lightbulb text-warning"></i> Improvement Suggestions:</h6>
+                    <div class="small">
+                        <ul class="mb-0">
+                            ${data.suggestions.map(s => `<li>${s}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Build detected patterns HTML
+        var patternsHtml = '';
+        if (data.detected_patterns && data.detected_patterns.length > 0) {
+            var uniquePatterns = [...new Set(data.detected_patterns.map(p => p.category))];
+            patternsHtml = `
+                <div class="mt-3">
+                    <h6><i class="fas fa-exclamation-triangle text-danger"></i> Detected Spam Patterns:</h6>
+                    <div class="small">
+                        ${uniquePatterns.map(pattern => 
+                            `<span class="badge bg-danger me-1 mb-1">${pattern}</span>`
+                        ).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Final HTML result
+        var html = `
+            <div class="alert ${alertClass}">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="mb-1">${riskIcon} Spam Score: <strong>${data.spam_probability}%</strong></h5>
+                        <p class="mb-2">${riskText}</p>
+                    </div>
+                    <span class="badge bg-${data.risk_color} fs-6">${data.spam_level}</span>
+                </div>
+                
+                ${patternsHtml}
+                ${suggestionsHtml}
+                
+                <div class="mt-3 pt-2 border-top">
+                    <small class="text-muted">
+                        <i class="fas fa-chart-line"></i> 
+                        <strong>Spam Score Guide:</strong> 
+                        <span class="text-success">0-40% (Safe)</span> | 
+                        <span class="text-info">41-60% (Low Risk)</span> | 
+                        <span class="text-warning">61-80% (Medium Risk)</span> | 
+                        <span class="text-danger">81-100% (High Risk)</span>
+                    </small>
+                </div>
+            </div>
+        `;
+        
+        $('#spamResult').html(html);
+    }
+    
+    // Auto-check when content is substantial
+    let checkTimeout;
+    editor.on('change', function() {
+        clearTimeout(checkTimeout);
+        var content = editor.getData();
+        // Auto-check only if content is substantial (> 50 characters)
+        if (content.length > 50) {
+            checkTimeout = setTimeout(function() {
+                // Optional: Auto-check after 3 seconds of inactivity
+                // checkSpamScore();
+            }, 3000);
+        }
+    });
+});
+</script>
+
+<style>
+.alert {
+    border-radius: 8px;
+    border-left: 4px solid;
+}
+
+.alert-success {
+    border-left-color: #28a745;
+}
+
+.alert-danger {
+    border-left-color: #dc3545;
+}
+
+.alert-warning {
+    border-left-color: #ffc107;
+}
+
+.alert-info {
+    border-left-color: #17a2b8;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.btn {
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card {
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %} {% endcomment %}
+
+
+
+
+
+
+
+
+
+{% comment %} {% extends "userhome.html" %}
+
+{% load static %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}
+{% endblock %}
+
+{% block outermain %}{% endblock %}
+{% block main %} {% endblock %}
+
+{% block top_campaigns %}
+
+  {% if messages %}
+  <div style="margin-bottom: 20px;">
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
+           role="alert" 
+           style="border-radius: 8px; font-weight: 500;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+  <div class="form-floating mb-4">
+    <input type="text" name="template_name" class="form-control" placeholder=" " required>
+    <label style="font-weight:bolder; color:gray;">Template Name</label>
+  </div>
+
+  <div class="mb-4">
+    <label class="form-label" style="font-weight:bolder; color:gray;">Category</label>
+    <select name="category" class="form-select" required>
+      <option value="" selected disabled>Select Category</option>
+      <option value="Promotional">Promotional</option>
+      <option value="Transactional">Transactional</option>
+      <option value="Newsletter">Newsletter</option>
+    </select>
+  </div>
+
+  <div class="mb-4">
+    <label class="form-label fw-bold mb-2" style="font-weight:bolder; color:gray;" >Content *</label>
+    <textarea name="content" id="templateContent"></textarea>
+  </div>
+
 
   <button type="submit" 
         class="btn" 
@@ -291,4 +951,4 @@
     toolbarCanCollapse: true
   });
 </script>
-{% endblock %}
+{% endblock %} {% endcomment %}

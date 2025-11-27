@@ -12,211 +12,273 @@
 {% endblock %}
 
 {% block top_campaigns %} {% endblock %}
-{% comment %} 
-{% block main %}
+{% block topbar1 %}{% endblock %}
+
+ {% block main %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
 <style>
-  :root {
-    --primary-color: #10b981;
-    --primary-hover: #0e9e72;
-    --text-color: #1e293b;
-    --light-gray: #f0fdf4;
-    --border-color: #b8bdbb;
-    --border-radius: 8px;
-    --box-shadow: 0 6px 20px rgba(16, 185, 129, 0.1);
-    --transition: all 0.3s ease;
-  }
+  .upload-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 
-  .form-container {
-    max-width: 1100px;
-
-    padding: 30px;
-    background: white;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    width: 100%;
-  }
-
-  h2 {
-    text-align: center;
-    color: var(--primary-color);
-    margin-bottom: 25px;
-    font-weight: 600;
-  }
-
-  #heading1{
-    font-weight:bold;
-  }
-
-  .form-group {
-    position: relative;
-    margin-bottom: 24px;
-  }
-
-  .form-group input[type="text"] {
-    width: 100%;
-    padding: 12px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    background: transparent;
-    font-size: 15px;
-    outline: none;
-    transition: var(--transition);
-  }
-
-  .form-group input[type="text"]:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
-  }
-
-  .form-group label {
-    position: absolute;
-    top: 13px;
-    left: 12px;
-    background: white;
-    padding: 0 6px;
-    color: #6b7280;
-    font-size: 14px;
-    transition: 0.2s;
-    pointer-events: none;
-  }
-
-  .form-group input:focus + label,
-  .form-group input:not(:placeholder-shown) + label {
-    top: -10px;
-    font-size: 12px;
-    color: var(--primary-color);
-  }
-
-  #drop-zone {
-    border: 2px dashed var(--border-color);
-    border-radius: var(--border-radius);
-    padding: 30px;
-    text-align: center;
-    color: #6b7280;
-    margin-bottom: 20px;
-    transition: var(--transition);
-    cursor: pointer;
-    background-color: var(--light-gray);
-    position: relative;
     overflow: hidden;
   }
-
-  #drop-zone:hover {
-    border-color: var(--primary-color);
-    background-color: rgba(16, 185, 129, 0.05);
+  
+  .card-header {
+    background: linear-gradient(135deg, #8FABD4 0%, #4A70A9 100%);
+    padding: 12px 20px;
+    border-bottom: 1px solid #8FABD4;
   }
-
-  #drop-zone.dragover {
-    background-color: rgba(52, 211, 153, 0.1);
-    border-color: var(--primary-color);
-    color: var(--primary-color);
+  
+  .card-body {
+    padding: 24px;
   }
-
-  #drop-zone i {
-    font-size: 48px;
-    color: var(--primary-color);
-    margin-bottom: 10px;
+  
+  .card-footer {
+    background: #EFECE3;
+    padding: 16px 24px;
+    border-top: 1px solid #8FABD4;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .form-label {
+    font-weight: 600;
+    color: #000000;
+    font-size: 14px;
+    margin-bottom: 8px;
     display: block;
   }
-
-  #drop-zone .file-info {
-    margin-top: 10px;
-    font-weight: 500;
-    color: var(--primary-color);
+  
+  .form-control {
+    border: 1px solid #8FABD4;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background-color: #ffffff;
+    color: #000000;
   }
-
-  input[type="file"] {
-    display: none;
+  
+  .form-control:focus {
+    border-color: #4A70A9;
+    box-shadow: 0 0 0 3px rgba(74, 112, 169, 0.1);
+    outline: none;
   }
-
-  .btn1 {
-    width: 100%;
-    padding: 14px;
+  
+  .form-control::placeholder {
+    color: #8FABD4;
+    opacity: 0.7;
+  }
+  
+  .btn-secondary {
+    background: #8FABD4;
     border: none;
-    border-radius: var(--border-radius);
-    background-color: var(--primary-color);
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    display: flex;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    color: #000000;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  
+  .btn-secondary:hover {
+    background: #4A70A9;
+    transform: translateY(-1px);
+    color: #ffffff;
+    text-decoration: none;
+  }
+  
+  .btn-primary-custom {
+    background: linear-gradient(135deg, #8FABD4 0%, #4A70A9 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-weight: 500;
+    color: #ffffff;
+    min-width: 140px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(143, 171, 212, 0.3);
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
   }
-
-  .btn1:hover {
-    background-color: var(--primary-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+  
+  .btn-primary-custom:hover {
+    background: linear-gradient(135deg, #4A70A9 0%, #3a5c8f 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(143, 171, 212, 0.4);
+    color: #ffffff;
   }
-
-  .file-requirements {
-    font-size: 14px;
-    color: #6b7280;
+  
+  .drop-zone {
+    border: 2px dashed #8FABD4;
+    background-color: #EFECE3;
+    border-radius: 8px;
+    padding: 40px 20px;
     text-align: center;
-    margin-top: -15px;
-    margin-bottom: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
   }
-
-  @media (max-width: 576px) {
-    .form-container {
+  
+  .drop-zone:hover {
+    border-color: #4A70A9;
+    background-color: rgba(143, 171, 212, 0.1);
+  }
+  
+  .drop-zone.dragover {
+    border-color: #4A70A9;
+    background-color: rgba(74, 112, 169, 0.1);
+  }
+  
+  .drop-zone.success {
+    border-color: #10b981;
+    background-color: rgba(16, 185, 129, 0.05);
+  }
+  
+  .upload-icon {
+    color: #4A70A9;
+    margin-bottom: 12px;
+  }
+  
+  .file-info {
+    color: #4A70A9;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+  
+  .text-muted {
+    color: #8FABD4 !important;
+  }
+  
+  .text-primary {
+    color: #4A70A9 !important;
+  }
+  
+  .alert {
+    border-radius: 8px;
+    border: none;
+    padding: 12px 16px;
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+  
+  .alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border-left: 4px solid #10b981;
+  }
+  
+  .alert-danger {
+    background: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .card-body {
       padding: 20px;
     }
-
-    #drop-zone {
-      padding: 20px;
+    
+    .card-footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .card-footer a, 
+    .card-footer button {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .btn-primary-custom {
+      min-width: auto;
+    }
+    
+    .drop-zone {
+      padding: 30px 15px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .card-body {
+      padding: 16px;
+    }
+    
+    .card-header {
+      padding: 10px 20px;
+    }
+    
+    .card-header h5 {
+      font-size: 18px;
+    }
+    
+    .drop-zone {
+      padding: 20px 10px;
     }
   }
 </style>
 
-<!-- Font Awesome for icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-<div class="form-container">
-  
-   {% if messages %}
-  <div style="margin-bottom: 20px;">
-    {% for message in messages %}
-      <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
-           role="alert" 
-           style="border-radius: 8px; font-weight: 500;">
-        {{ message }}
-      </div>
-    {% endfor %}
+<div class="upload-card">
+  <div class="card-header text-white">
+    <h5 class="mb-0"><i class="fas fa-cloud-upload-alt me-2"></i>Upload Your Data File</h5>
   </div>
-{% endif %}
-
-  <h2 id="heading1">Upload Your Data File</h2>
 
   <form id="upload-form" action="/add_list/" method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
-    <!-- Floating Label Input -->
-    <div class="form-group">
-      <input type="text" id="filename" name="list_name" placeholder=" " required>
-      <label for="filename">List Name</label>
-    </div>
-
-
-    <!-- Drop Zone for File Upload -->
-    <div class="form-group">
-      <label>Select File</label>
-      <div id="drop-zone">
-        <i class="fas fa-cloud-upload-alt"></i>
-        <div id="drop-text">Drag & Drop your file here</div>
-        <div>or</div>
-        <div class="browse-text">Browse Files</div>
-        <div id="file-info" class="file-info" style="display: none;"></div>
+    {% if messages %}
+      <div class="p-3">
+        {% for message in messages %}
+          <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" 
+               role="alert">
+            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-triangle{% endif %} me-2"></i>
+            {{ message }}
+          </div>
+        {% endfor %}
       </div>
-      <div class="file-requirements">Supports: CSV, XLS, XLSX (Max 10MB)</div>
-      <input type="file" id="file" name="file" accept=".csv,.xls,.xlsx" required>
+    {% endif %}
+
+    <div class="card-body row g-3">
+      <div class="col-12">
+        <label class="form-label">List Name</label>
+        <input type="text" name="list_name" class="form-control" placeholder="Enter a name for your list" required>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">Select File</label>
+        <div class="drop-zone" id="drop-zone">
+          <i class="fas fa-cloud-upload-alt fa-2x upload-icon"></i>
+          <div id="drop-text">Drag & Drop your file here</div>
+          <div class="text-muted mt-1">or <span class="text-primary fw-semibold">Browse Files</span></div>
+          <div id="file-info" class="file-info" style="display: none;"></div>
+        </div>
+        <input type="file" name="file" id="file" class="d-none" accept=".csv,.xls,.xlsx" required>
+        <small class="text-muted d-block mt-2">
+          <i class="fas fa-info-circle me-1"></i>
+          Supports: CSV, XLS, XLSX (Max 10MB)
+        </small>
+      </div>
     </div>
 
-    <button type="submit" class="btn1">
-      <i class="fas fa-upload"></i> Upload File
-    </button>
+    <div class="card-footer">
+      <a href="/userhome/" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Cancel
+      </a>
+      <button type="submit" class="btn btn-primary-custom">
+        <i class="fas fa-upload me-1"></i> Upload File
+      </button>
+    </div>
   </form>
 </div>
 
@@ -265,22 +327,30 @@
       return;
     }
 
-    fileInfo.style.display = 'block';
-    fileInfo.innerHTML = `<i class="fas fa-file-alt"></i> ${file.name}`;
-
-    fileInput.files = [file];
     dropText.style.display = 'none';
     fileInfo.style.display = 'block';
-    fileInfo.innerHTML = `<i class="fas fa-file-alt"></i> ${file.name}`;
-    dropZone.style.borderColor = '#10b981';
-    dropZone.style.backgroundColor = 'rgba(16, 185, 129, 0.05)';
+    fileInfo.innerHTML = `<i class="fas fa-file-alt me-2"></i>${file.name} <small class="text-muted">(${(file.size / 1024 / 1024).toFixed(2)} MB)</small>`;
+    dropZone.classList.add('success');
   }
 </script>
 {% endblock %}
- {% endcomment %}
 
 
 
+{% comment %} {% extends "userhome.html" %}
+
+{% load static %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}
+{% endblock %}
+
+{% block top_campaigns %} {% endblock %}
 
  {% block main %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -330,9 +400,6 @@
 
     <div class="card-footer d-flex justify-content-between flex-wrap">
       <a href="/userhome/" class="btn btn-secondary">← Cancel</a>
-      {% comment %} <button type="submit" class="btn btn-success">
-        <i class="fas fa-upload me-1"></i> Upload File
-      </button> {% endcomment %}
 
       <button type="submit" 
         class="btn" 
@@ -399,4 +466,4 @@
     dropZone.style.backgroundColor = 'rgba(16, 185, 129, 0.05)';
   }
 </script>
-{% endblock %}
+{% endblock %} {% endcomment %}

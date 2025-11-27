@@ -1,0 +1,216 @@
+<!-- followups/templates/followups/create_followup.html -->
+{% extends "userhome.html" %}
+
+{% block topbar1 %}{% endblock %}
+
+{% block outermain %}{% endblock %}
+
+{% block summary_content %}{% endblock %}
+
+{% block top_campaigns %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">🔄 Create Follow-up Campaign</h1>
+        <a href="{% url 'followups:followup_dashboard' %}" class="btn btn-outline-secondary">
+            ← Back to Follow-ups
+        </a>
+    </div>
+
+    <!-- Campaign Info -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Original Campaign: {{ original_campaign.name }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <strong>Total Recipients:</strong> {{ total_recipients }}
+                </div>
+                <div class="col-md-3">
+                    <strong>Non-openers:</strong> {{ non_openers }}
+                </div>
+                <div class="col-md-3">
+                    <strong>Non-clickers:</strong> {{ non_clickers }}
+                </div>
+                <div class="col-md-3">
+                    <strong>Your Credits:</strong> {{ credits_left }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" id="followupForm">
+        {% csrf_token %}
+        
+        <!-- Basic Settings -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">📋 Follow-up Settings</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="name">Follow-up Campaign Name *</label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="Follow-up: {{ original_campaign.name }}" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="max_followups">Number of Follow-ups *</label>
+                            <select class="form-control" id="max_followups" name="max_followups" required>
+                                <option value="1">1 Follow-up</option>
+                                <option value="2">2 Follow-ups</option>
+                                <option value="3" selected>3 Follow-ups</option>
+                                <option value="5">5 Follow-ups</option>
+                                <option value="7">7 Follow-ups</option>
+                                <option value="11">11 Follow-ups (Max)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="days_between">Days Between *</label>
+                            <select class="form-control" id="days_between" name="days_between" required>
+                                <option value="1">1 Day</option>
+                                <option value="2" selected>2 Days</option>
+                                <option value="3">3 Days</option>
+                                <option value="5">5 Days</option>
+                                <option value="7">7 Days</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="trigger_time">Send Time *</label>
+                            <select class="form-control" id="trigger_time" name="trigger_time" required>
+                                {% for time in time_options %}
+                                <option value="{{ time }}" {% if time == '11:00' %}selected{% endif %}>
+                                    {{ time }} {% if time == '09:00' %}AM{% elif time == '11:00' %}AM{% else %}PM{% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-check mt-4">
+                            <input class="form-check-input" type="checkbox" id="stop_on_open" name="stop_on_open" checked>
+                            <label class="form-check-label" for="stop_on_open">
+                                Stop follow-ups when recipient opens any email
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="stop_on_click" name="stop_on_click" checked>
+                            <label class="form-check-label" for="stop_on_click">
+                                Stop follow-ups when recipient clicks any link
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Follow-up Sequences -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">✉️ Follow-up Emails</h5>
+                <small class="text-muted" id="sequenceCounter">1 of 3 sequences</small>
+            </div>
+            <div class="card-body" id="sequencesContainer">
+                <!-- Sequences will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Credit Check -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div id="creditCheckResult"></div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
+                        🚀 Create Follow-up Campaign
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const maxFollowupsSelect = document.getElementById('max_followups');
+    const sequencesContainer = document.getElementById('sequencesContainer');
+    const sequenceCounter = document.getElementById('sequenceCounter');
+    
+    // Initial sequences
+    updateSequences();
+    
+    // Update sequences when max_followups changes
+    maxFollowupsSelect.addEventListener('change', updateSequences);
+    
+    // Credit check when settings change
+    document.getElementById('stop_on_open').addEventListener('change', checkCredit);
+    document.getElementById('stop_on_click').addEventListener('change', checkCredit);
+    maxFollowupsSelect.addEventListener('change', checkCredit);
+    
+    function updateSequences() {
+        const maxFollowups = parseInt(maxFollowupsSelect.value);
+        sequencesContainer.innerHTML = '';
+        sequenceCounter.textContent = `1 of ${maxFollowups} sequences`;
+        
+        for (let i = 1; i <= maxFollowups; i++) {
+            const sequenceHTML = `
+            <div class="sequence-card card mb-3" data-sequence="${i}">
+                <div class="card-header">
+                    <h6 class="mb-0">Follow-up #${i}</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Subject *</label>
+                        <input type="text" class="form-control" name="subject_${i}" 
+                               placeholder="Enter email subject" required
+                               value="${i === 1 ? 'Following up: ' + '{{ original_campaign.subject }}' : ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Content *</label>
+                        <textarea class="form-control" name="body_${i}" rows="6" 
+                                  placeholder="Enter email content" required>${i === 1 ? 'Hi {{name}},\n\nI wanted to follow up on my previous email. ' + '{{ original_campaign.custom_template|default:original_campaign.template.content|truncatewords:20 }}' + '\n\nBest regards,\n{{ sender_name }}' : ''}</textarea>
+                    </div>
+                    ${i > 1 ? `<div class="alert alert-info">
+                        <small>This email will be sent ${i === 2 ? '' : i-1} days after the previous follow-up.</small>
+                    </div>` : ''}
+                </div>
+            </div>`;
+            sequencesContainer.innerHTML += sequenceHTML;
+        }
+        
+        checkCredit();
+    }
+    
+    function checkCredit() {
+        const stopOnOpen = document.getElementById('stop_on_open').checked;
+        const stopOnClick = document.getElementById('stop_on_click').checked;
+        const maxFollowups = maxFollowupsSelect.value;
+        
+        // Simulate credit check - in real implementation, this would be an AJAX call
+        const estimatedRecipients = {{ non_openers }}; // This should be calculated based on settings
+        
+        document.getElementById('creditCheckResult').innerHTML = `
+            <div class="alert alert-info">
+                <strong>Credit Estimate:</strong> 
+                Approximately ${estimatedRecipients * maxFollowups} credits will be used for this follow-up campaign.
+                <br>
+                <strong>Your available credits:</strong> {{ credits_left }}
+            </div>
+        `;
+    }
+    
+    // Initial credit check
+    checkCredit();
+});
+</script>
+{% endblock %}

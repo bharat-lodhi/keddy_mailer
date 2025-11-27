@@ -5,16 +5,6 @@ import os
 from django.db.models import Sum
 from django.utils import timezone
 from datetime import timedelta
-
-
-# def get_hourly_email_count(smtp_server):
-#     now = timezone.now()
-#     one_hour_ago = now - timedelta(hours=1)
-
-#     return SMTPUsageLog.objects.filter(
-#         smtp_server=smtp_server,
-#         timestamp__gte=one_hour_ago
-#     ).aggregate(total=Sum('email_count'))['total'] or 0
     
     
 def get_hourly_email_count(smtp_obj):

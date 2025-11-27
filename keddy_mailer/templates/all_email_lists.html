@@ -2,6 +2,307 @@
 
 {% block summary_content %}{% endblock %}
 
+{% block outermain %}{% endblock %}
+
+{% block main %}{% endblock %}
+
+{% block top_campaigns %}
+
+<style>
+  .lists-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #8FABD4;
+    overflow: hidden;
+  }
+  
+  .card-header {
+    background: linear-gradient(135deg, #8FABD4 0%, #4A70A9 100%);
+    padding: 12px 20px;
+    border-bottom: 1px solid #8FABD4;
+  }
+  
+  .card-body {
+    padding: 0;
+  }
+  
+  .table {
+    margin-bottom: 0;
+    border-color: #8FABD4;
+  }
+  
+  .table th {
+    background-color: #EFECE3;
+    color: #000000;
+    font-weight: 600;
+    border-color: #8FABD4;
+    padding: 12px 16px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  
+  .table td {
+    border-color: #8FABD4;
+    padding: 12px 16px;
+    font-size: 14px;
+    vertical-align: middle;
+    color: #000000;
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: #EFECE3;
+  }
+  
+  .badge {
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 500;
+    border: 1px solid #8FABD4;
+  }
+  
+  .btn {
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: 500;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .btn-info {
+    background: linear-gradient(135deg, #8FABD4 0%, #4A70A9 100%);
+    color: #ffffff;
+  }
+  
+  .btn-info:hover {
+    background: linear-gradient(135deg, #4A70A9 0%, #3a5c8f 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(143, 171, 212, 0.4);
+    color: #ffffff;
+    text-decoration: none;
+  }
+  
+  .btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #ffffff;
+  }
+  
+  .btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.4);
+    color: #ffffff;
+    text-decoration: none;
+  }
+  
+  .btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  
+  .alert {
+    border-radius: 8px;
+    border: none;
+    padding: 12px 16px;
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+  
+  .alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border-left: 4px solid #10b981;
+  }
+  
+  .alert-danger {
+    background: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+  }
+  
+  .alert-warning {
+    background: #fef3c7;
+    color: #92400e;
+    border-left: 4px solid #f59e0b;
+  }
+  
+  .table-light {
+    background-color: #EFECE3 !important;
+  }
+  
+  .text-center {
+    color: #8FABD4;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .card-header {
+      padding: 14px 20px;
+    }
+    
+    .card-header h5 {
+      font-size: 18px;
+    }
+    
+    .table-responsive {
+      border: 1px solid #8FABD4;
+      border-radius: 8px;
+    }
+    
+    .table th,
+    .table td {
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+    
+    .btn {
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+    
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .card-header {
+      padding: 12px 16px;
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    
+    .card-header .d-flex {
+      width: 100%;
+      justify-content: space-between;
+    }
+    
+    .table th,
+    .table td {
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+    
+    .btn {
+      padding: 4px 8px;
+      font-size: 11px;
+    }
+  }
+</style>
+
+<div>
+  <div class="lists-card">
+    <div class="card-header text-white d-flex justify-content-between align-items-center">
+      <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>All Email Lists</h5>
+      <span class="badge">Total: {{ email_lists|length }}</span>
+    </div>
+    <div class="card-body">
+      {% if messages %}
+        <div class="p-3">
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert">
+              <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %} me-2"></i>
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>List Name</th>
+              <th>Uploaded By</th>
+              <th>Total Emails</th>
+              <th>Uploaded At</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for list in email_lists %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td class="fw-medium">{{ list.name }}</td>
+                <td>{{ list.user }}</td>
+                <td>
+                  <span class="badge bg-light text-dark border-0">{{ list.total_emails }}</span>
+                </td>
+                <td class="text-muted">{{ list.created_at|date:"M d, Y H:i" }}</td>
+                <td>
+                  <div class="action-buttons d-flex gap-2">
+                    <a href="{% url 'download_email_list' list.id %}" class="btn btn-info btn-sm">
+                      <i class="bi bi-download"></i> Download
+                    </a>
+                    <a href="{% url 'delete_email_list' list.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this list?')">
+                      <i class="bi bi-trash"></i> Delete
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="6" class="text-center py-4">
+                  <i class="bi bi-inbox display-4 d-block mb-2" style="color: #8FABD4;"></i>
+                  No email lists found.
+                  <br>
+                  <small class="text-muted">Upload your first email list to get started.</small>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Add confirmation for delete actions
+  document.addEventListener('DOMContentLoaded', function() {
+    const deleteButtons = document.querySelectorAll('.btn-danger');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        if (!confirm('Are you sure you want to delete this email list? This action cannot be undone.')) {
+          e.preventDefault();
+        }
+      });
+    });
+    
+    // Add smooth hover effects
+    const tableRows = document.querySelectorAll('tbody tr');
+    tableRows.forEach(row => {
+      row.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-1px)';
+        this.style.transition = 'all 0.2s ease';
+      });
+      row.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+      });
+    });
+  });
+</script>
+
+{% endblock %}
+
+
+
+{% comment %} {% extends "adminhome.html" %}
+
+{% block summary_content %}{% endblock %}
+
 
 
 {% block outermain %}{% endblock %}
@@ -65,4 +366,4 @@
   </div>
 </div>
 
-{% endblock %}
+{% endblock %} {% endcomment %}

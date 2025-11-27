@@ -1,0 +1,1057 @@
+{% extends "userhome.html" %}
+{% load static %}
+
+{% block topbar %}{% endblock %}
+{% block summary_content %}{% endblock %}
+{% block other %}{% endblock %}
+{% block main %}{% endblock %}
+{% block outermain %}{% endblock %}
+{% block topbar1 %}{% endblock %}
+
+{% block top_campaigns %}
+
+<style>
+  /* ---------- STYLING ---------- */
+  #campaignChart {
+    max-width: 480px;
+    max-height: 480px;
+    margin: 20px auto;
+  }
+
+  .no-data-row {
+    text-align: center;
+    font-style: italic;
+    color: #6c757d;
+  }
+
+  .filter-btn.active {
+    background-color: #007bff !important;
+    color: #fff !important;
+  }
+
+  .card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: white;
+  }
+  .status-sent { background-color: #28a745; }
+  .status-failed { background-color: #dc3545; }
+  .status-opened { background-color: #ffc107; color: black; }
+  .status-clicked { background-color: #17a2b8; }
+
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .legend-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+  }
+
+  /* Subject Line Info Styles */
+  .subject-line-info {
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    border-left: 5px solid #007bff;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+  }
+  .subject-label {
+    font-weight: 700;
+    color: #2c3e50;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  .subject-value {
+    color: #1a1a1a;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .file-badge {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    display: inline-block;
+    margin-left: 10px;
+  }
+  .subject-meta {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 8px;
+  }
+</style>
+
+<div class="container mt-4">
+  <!-- Campaign Header -->
+  <div class="text-center mb-4">
+    <h3 class="display-6 fw-bold text-primary">{{ campaign.name }}</h3>
+    
+    <!-- Subject Line Information -->
+    <div class="subject-line-info">
+      <div class="row align-items-center">
+        <div class="col-md-12">
+          <div class="subject-label">📧 CAMPAIGN SUBJECT LINE</div>
+          <div class="subject-value">
+            {% if campaign.subject_line_file %}
+              {{ campaign.subject_line_file.file_name }}
+              <span class="file-badge">Subject Line File</span>
+            {% else %}
+              "{{ campaign.subject }}"
+            {% endif %}
+          </div>
+          {% if campaign.subject_line_file %}
+          <div class="subject-meta">
+            <i class="fas fa-file-alt me-1"></i>
+            Selected during campaign creation • 
+            Uploaded: {{ campaign.subject_line_file.uploaded_at|date:"M d, Y • h:i A" }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row my-4 justify-content-center">
+    {% for key, val in summary.items %}
+      <div class="col-md-2 col-sm-4 mb-3">
+        <div class="card text-center shadow-sm border-0 h-100">
+          <div class="card-body d-flex flex-column">
+            <h6 class="text-uppercase text-muted mb-3">{{ key|capfirst }}</h6>
+            <h3 class="display-6 fw-bold text-dark mb-3">{{ val }}</h3>
+            <button class="btn btn-sm btn-outline-primary filter-btn mt-auto {% if forloop.first %}active{% endif %}" data-status="{{ key|lower }}">
+              View Emails
+            </button>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Chart + Legend -->
+  <div class="my-5">
+    <div class="legend">
+      <div class="legend-item"><span class="legend-color" style="background: #28a745;"></span>Sent</div>
+      <div class="legend-item"><span class="legend-color" style="background: #dc3545;"></span>Failed</div>
+      <div class="legend-item"><span class="legend-color" style="background: #ffc107;"></span>Opened</div>
+      <div class="legend-item"><span class="legend-color" style="background: #17a2b8;"></span>Clicked</div>
+    </div>
+    <div class="text-center">
+      <canvas id="campaignChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Email Table -->
+  <div class="card shadow-sm border-0 mt-5">
+    <div class="card-header bg-white border-0 py-3">
+      <h5 class="card-title mb-0 text-dark">
+        <i class="fas fa-envelope me-2 text-primary"></i>
+        Email Tracking Details
+      </h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="emailTable">
+          <thead class="table-light">
+            <tr>
+              <th class="ps-4">#</th>
+              <th>Email Address</th>
+              <th>Status</th>
+              <th>Sent At</th>
+              <th>Opened At</th>
+              <th class="pe-4">Clicked At</th>
+            </tr>
+          </thead>
+          <tbody id="emailTableBody">
+            {% for email in emails %}
+            <tr data-status="
+                {% if email.is_failed %}failed{% endif %}
+                {% if email.is_opened %},{% if not email.is_failed %}opened{% endif %}{% endif %}
+                {% if email.is_clicked %},{% if not email.is_failed %}clicked{% endif %}{% endif %}
+                {% if not email.is_failed and not email.is_opened and not email.is_clicked %},sent{% endif %}
+              " class="email-row">
+              <td class="ps-4 fw-semibold">{{ forloop.counter }}</td>
+              <td>
+                <i class="fas fa-envelope me-2 text-muted"></i>
+                {{ email.recipient }}
+              </td>
+              <td>
+                {% if email.is_failed %}
+                  <span class="status-badge status-failed">
+                    <i class="fas fa-times-circle me-1"></i>Failed
+                  </span>
+                {% elif email.is_clicked %}
+                  <span class="status-badge status-clicked">
+                    <i class="fas fa-mouse-pointer me-1"></i>Clicked
+                  </span>
+                {% elif email.is_opened %}
+                  <span class="status-badge status-opened">
+                    <i class="fas fa-eye me-1"></i>Opened
+                  </span>
+                {% else %}
+                  <span class="status-badge status-sent">
+                    <i class="fas fa-check-circle me-1"></i>Sent
+                  </span>
+                {% endif %}
+              </td>
+              <td>
+                {% if email.sent_at %}
+                  <span class="text-success">
+                    <i class="fas fa-paper-plane me-1"></i>
+                    {{ email.sent_at|date:"Y-m-d H:i" }}
+                  </span>
+                {% else %}
+                  <span class="text-muted">-</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if email.open_timestamp %}
+                  <span class="text-warning">
+                    <i class="fas fa-eye me-1"></i>
+                    {{ email.open_timestamp|date:"Y-m-d H:i" }}
+                  </span>
+                {% else %}
+                  <span class="text-muted">-</span>
+                {% endif %}
+              </td>
+              <td class="pe-4">
+                {% if email.click_timestamp %}
+                  <span class="text-info">
+                    <i class="fas fa-mouse-pointer me-1"></i>
+                    {{ email.click_timestamp|date:"Y-m-d H:i" }}
+                  </span>
+                {% else %}
+                  <span class="text-muted">-</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr id="noDataDefault">
+              <td colspan="6" class="text-center py-5 text-muted">
+                <i class="fas fa-inbox fa-3x mb-3"></i>
+                <p class="mb-0">No emails found for this campaign</p>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Chart
+  const ctx = document.getElementById("campaignChart").getContext("2d");
+  new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: ["Sent", "Failed", "Opened", "Clicked"],
+      datasets: [{
+        label: "Emails",
+        data: [
+          {{ summary.sent }},
+          {{ summary.failed }},
+          {{ summary.opened }},
+          {{ summary.clicked }}
+        ],
+        backgroundColor: ["#28a745", "#dc3545", "#ffc107", "#17a2b8"],
+        borderWidth: 3,
+        borderColor: '#fff'
+      }]
+    },
+    options: { 
+      responsive: true, 
+      cutout: '65%',
+      plugins: { 
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const label = context.label || '';
+              const value = context.raw || 0;
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = Math.round((value / total) * 100);
+              return `${label}: ${value} (${percentage}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Filtering
+  const buttons = document.querySelectorAll(".filter-btn");
+  const tableBody = document.getElementById("emailTableBody");
+  const tableRows = tableBody.querySelectorAll("tr[data-status]");
+  const noDataDefault = document.getElementById("noDataDefault");
+
+  function showNoDataMessage(status) {
+    const message = status === "total" ? "No emails found for this campaign" : `No ${status} emails found`;
+    let noDataRow = document.getElementById("noDataRow");
+    if (!noDataRow) {
+      noDataRow = document.createElement("tr");
+      noDataRow.id = "noDataRow";
+      noDataRow.innerHTML = `
+        <td colspan="6" class="text-center py-5 text-muted">
+          <i class="fas fa-search fa-2x mb-3"></i>
+          <p class="mb-0">${message}</p>
+        </td>
+      `;
+      tableBody.appendChild(noDataRow);
+    } else {
+      noDataRow.querySelector("td").innerHTML = `
+        <i class="fas fa-search fa-2x mb-3"></i>
+        <p class="mb-0">${message}</p>
+      `;
+    }
+  }
+
+  function hideNoDataMessage() {
+    const noDataRow = document.getElementById("noDataRow");
+    if (noDataRow) noDataRow.remove();
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      buttons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      const status = btn.getAttribute("data-status").toLowerCase();
+      let visibleRows = 0;
+
+      tableRows.forEach(row => {
+        const statuses = row.dataset.status.split(",").map(s => s.trim().toLowerCase());
+        if (status === "total" || statuses.includes(status)) {
+          row.style.display = "";
+          visibleRows++;
+        } else {
+          row.style.display = "none";
+        }
+      });
+
+      if (noDataDefault) noDataDefault.style.display = "none";
+      visibleRows === 0 ? showNoDataMessage(status) : hideNoDataMessage();
+    });
+  });
+
+  // Default hide no data
+  if (tableRows.length > 0 && noDataDefault) noDataDefault.style.display = "none";
+});
+</script>
+
+{% endblock %}
+
+
+
+
+
+
+
+{% comment %} {% extends "userhome.html" %}
+{% load static %}
+
+{% block topbar %}{% endblock %}
+{% block summary_content %}{% endblock %}
+{% block other %}{% endblock %}
+{% block main %}{% endblock %}
+{% block outermain %}{% endblock %}
+
+{% block top_campaigns %}
+
+<style>
+  /* ---------- STYLING ---------- */
+  #campaignChart {
+    max-width: 480px;
+    max-height: 480px;
+    margin: 20px auto;
+  }
+
+  .no-data-row {
+    text-align: center;
+    font-style: italic;
+    color: #6c757d;
+  }
+
+  .filter-btn.active {
+    background-color: #007bff !important;
+    color: #fff !important;
+  }
+
+  .card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: white;
+  }
+  .status-sent { background-color: #28a745; }
+  .status-failed { background-color: #dc3545; }
+  .status-opened { background-color: #ffc107; color: black; }
+  .status-clicked { background-color: #17a2b8; }
+
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .legend-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+  }
+</style>
+
+<div class="container mt-4">
+  <!-- Campaign Header -->
+  <h3 class="text-center">{{ campaign.name }}</h3>
+  <p class="text-center text-muted">Subject: {{ campaign.subject }}</p>
+
+  <!-- Summary Cards -->
+  <div class="row my-4 justify-content-center">
+    {% for key, val in summary.items %}
+      <div class="col-md-2 col-sm-4 mb-3">
+        <div class="card text-center shadow-sm border-0">
+          <div class="card-body">
+            <h6 class="text-uppercase text-muted">{{ key|capfirst }}</h6>
+            <h3>{{ val }}</h3>
+            <button class="btn btn-sm btn-outline-primary filter-btn {% if forloop.first %}active{% endif %}" data-status="{{ key|lower }}">
+              View
+            </button>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Chart + Legend -->
+  <div class="my-5 text-center">
+    <div class="legend">
+      <div class="legend-item"><span class="legend-color" style="background: green;"></span>Sent</div>
+      <div class="legend-item"><span class="legend-color" style="background: red;"></span>Failed</div>
+      <div class="legend-item"><span class="legend-color" style="background: orange;"></span>Opened</div>
+      <div class="legend-item"><span class="legend-color" style="background: blue;"></span>Clicked</div>
+    </div>
+    <canvas id="campaignChart"></canvas>
+  </div>
+
+  <!-- Email Table -->
+  <div class="table-responsive mt-5">
+    <table class="table table-striped align-middle" id="emailTable">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Sent At</th>
+          <th>Opened At</th>
+          <th>Clicked At</th>
+        </tr>
+      </thead>
+      <tbody id="emailTableBody">
+        {% for email in emails %}
+        <tr data-status="{% if email.is_failed %}failed{% elif email.is_clicked %}clicked{% elif email.is_opened %}opened{% else %}sent{% endif %}">
+          <td>{{ forloop.counter }}</td>
+          <td>{{ email.recipient }}</td>
+          <td>
+            {% if email.is_failed %}
+              <span class="status-badge status-failed">Failed</span>
+            {% elif email.is_clicked %}
+              <span class="status-badge status-clicked">Clicked</span>
+            {% elif email.is_opened %}
+              <span class="status-badge status-opened">Opened</span>
+            {% else %}
+              <span class="status-badge status-sent">Sent</span>
+            {% endif %}
+          </td>
+          <td>{{ email.sent_at|default:"-"|date:"Y-m-d H:i" }}</td>
+          <td>{{ email.open_timestamp|default:"-"|date:"Y-m-d H:i" }}</td>
+          <td>{{ email.click_timestamp|default:"-"|date:"Y-m-d H:i" }}</td>
+        </tr>
+        {% empty %}
+        <tr id="noDataDefault">
+          <td colspan="6" class="no-data-row">No emails found for this campaign</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Initialize Chart
+  const ctx = document.getElementById("campaignChart").getContext("2d");
+  new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: ["Sent", "Failed", "Opened", "Clicked"],
+      datasets: [{
+        label: "Emails",
+        data: [
+          {{ summary.sent }},
+          {{ summary.failed }},
+          {{ summary.opened }},
+          {{ summary.clicked }}
+        ],
+        backgroundColor: ["#28a745", "#dc3545", "#ffc107", "#17a2b8"],
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+      }
+    }
+  });
+
+  // Filtering Logic
+  const buttons = document.querySelectorAll(".filter-btn");
+  const tableBody = document.getElementById("emailTableBody");
+  const tableRows = tableBody.querySelectorAll("tr[data-status]");
+  const noDataDefault = document.getElementById("noDataDefault");
+
+  function showNoDataMessage(status) {
+    const message = status === "all"
+      ? "No emails found for this campaign"
+      : `No ${status} emails found`;
+
+    let noDataRow = document.getElementById("noDataRow");
+    if (!noDataRow) {
+      noDataRow = document.createElement("tr");
+      noDataRow.id = "noDataRow";
+      noDataRow.innerHTML = `<td colspan="6" class="no-data-row">${message}</td>`;
+      tableBody.appendChild(noDataRow);
+    } else {
+      noDataRow.querySelector("td").textContent = message;
+    }
+  }
+
+  function hideNoDataMessage() {
+    const noDataRow = document.getElementById("noDataRow");
+    if (noDataRow) noDataRow.remove();
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      buttons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      const status = btn.getAttribute("data-status");
+      let visibleRows = 0;
+
+      tableRows.forEach(row => {
+        if (status === "all" || row.dataset.status === status) {
+          row.style.display = "";
+          visibleRows++;
+        } else {
+          row.style.display = "none";
+        }
+      });
+
+      if (noDataDefault) noDataDefault.style.display = "none";
+      visibleRows === 0 ? showNoDataMessage(status) : hideNoDataMessage();
+    });
+  });
+
+  // Hide default "no data" if emails exist
+  if (tableRows.length > 0 && noDataDefault) {
+    noDataDefault.style.display = "none";
+  }
+});
+</script>
+
+{% endblock %} {% endcomment %}
+
+
+{% comment %} {% extends "userhome.html" %}
+{% load static %}
+
+{% block topbar %}{% endblock %}
+{% block summary_content %}{% endblock %}
+{% block other %}{% endblock %}
+{% block main %}{% endblock %}
+{% block outermain %}{% endblock %}
+
+{% block top_campaigns %}
+
+<style>
+  #campaignChart {
+    max-width: 500px;
+    max-height: 500px;
+    margin: auto;
+  }
+  .no-data-row {
+    text-align: center;
+    font-style: italic;
+    color: #6c757d;
+  }
+  .filter-btn.active {
+    background-color: #007bff !important;
+    color: #fff !important;
+  }
+</style>
+
+<div class="container mt-4">
+
+  <!-- Campaign Name -->
+  <h3>{{ campaign.name }}</h3>
+  <p>Subject: {{ campaign.subject }}</p>
+
+  <!-- Summary Cards -->
+  <div class="row my-3">
+    <div class="col-md-2">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h5>Total</h5>
+          <h4>{{ summary.total }}</h4>
+          <button class="btn btn-sm btn-primary filter-btn active" data-status="all">View</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-2">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h5>Sent</h5>
+          <h4>{{ summary.sent }}</h4>
+          <button class="btn btn-sm btn-success filter-btn" data-status="sent">View</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-2">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h5>Failed</h5>
+          <h4>{{ summary.failed }}</h4>
+          <button class="btn btn-sm btn-danger filter-btn" data-status="failed">View</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-2">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h5>Opened</h5>
+          <h4>{{ summary.opened }}</h4>
+          <button class="btn btn-sm btn-warning filter-btn" data-status="opened">View</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-2">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h5>Clicked</h5>
+          <h4>{{ summary.clicked }}</h4>
+          <button class="btn btn-sm btn-info filter-btn" data-status="clicked">View</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graph -->
+  <div class="my-6 text-center">
+    <canvas id="campaignChart"></canvas>
+  </div>
+
+  <!-- Email Table -->
+  <div class="table-responsive mt-4">
+    <table class="table table-striped" id="emailTable">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Sent At</th>
+          <th>Opened At</th>
+          <th>Clicked At</th>
+        </tr>
+      </thead>
+      <tbody id="emailTableBody">
+        {% for email in emails %}
+        <tr data-status="{% if email.is_clicked %}clicked{% elif email.is_opened %}opened{% else %}sent{% endif %}">
+          <td>{{ forloop.counter }}</td>
+          <td>{{ email.recipient }}</td>
+          <td>
+            {% if email.is_clicked %}
+              Clicked
+            {% elif email.is_opened %}
+              Opened
+            {% else %}
+              Sent
+            {% endif %}
+          </td>
+          <td>{{ email.sent_at|date:"Y-m-d H:i" }}</td>
+          <td>{{ email.open_timestamp|default:"-"|date:"Y-m-d H:i" }}</td>
+          <td>{{ email.click_timestamp|default:"-"|date:"Y-m-d H:i" }}</td>
+        </tr>
+        {% empty %}
+        <tr id="noDataDefault">
+          <td colspan="6" class="no-data-row">No emails found for this campaign</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const ctx = document.getElementById("campaignChart").getContext("2d");
+    const campaignChart = new Chart(ctx, {
+      type: "pie",
+      data: {
+        labels: ["Sent", "Failed", "Opened", "Clicked"],
+        datasets: [{
+          label: "Emails",
+          data: [
+            {{ summary.sent }},
+            {{ summary.failed }},
+            {{ summary.opened }},
+            {{ summary.clicked }}
+          ],
+          backgroundColor: ["green", "red", "orange", "blue"],
+          borderWidth: 1
+        }]
+      },
+      options: { responsive: true }
+    });
+
+    const buttons = document.querySelectorAll(".filter-btn");
+    const tableBody = document.getElementById("emailTableBody");
+    const tableRows = tableBody.querySelectorAll("tr[data-status]");
+    const noDataDefault = document.getElementById("noDataDefault");
+
+    function showNoDataMessage(status) {
+      const message = status === "all"
+        ? "No emails found for this campaign"
+        : `No ${status} emails found`;
+
+      let noDataRow = document.getElementById("noDataRow");
+      if (!noDataRow) {
+        noDataRow = document.createElement("tr");
+        noDataRow.id = "noDataRow";
+        noDataRow.innerHTML = `<td colspan="6" class="no-data-row">${message}</td>`;
+        tableBody.appendChild(noDataRow);
+      } else {
+        noDataRow.querySelector("td").textContent = message;
+      }
+    }
+
+    function hideNoDataMessage() {
+      const noDataRow = document.getElementById("noDataRow");
+      if (noDataRow) noDataRow.remove();
+    }
+
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        buttons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        const status = btn.getAttribute("data-status");
+        let visibleRows = 0;
+
+        tableRows.forEach(row => {
+          if (status === "all" || row.dataset.status === status) {
+            row.style.display = "";
+            visibleRows++;
+          } else {
+            row.style.display = "none";
+          }
+        });
+
+        if (noDataDefault) noDataDefault.style.display = "none";
+
+        if (visibleRows === 0) {
+          showNoDataMessage(status);
+        } else {
+          hideNoDataMessage();
+        }
+      });
+    });
+
+    // Hide default "no data" if emails exist
+    if (tableRows.length > 0 && noDataDefault) {
+      noDataDefault.style.display = "none";
+    }
+  });
+</script>
+{% endblock %} {% endcomment %}
+
+
+
+
+
+{% comment %} {% extends "userhome.html" %}
+{% load static %}
+
+{% block topbar %}
+{% endblock %}
+
+{% block summary_content %}
+{% endblock %}
+
+{% block other %}{% endblock %}
+
+{% block main %}{% endblock %}
+
+{% block outermain %}{% endblock %}
+
+{% block top_campaigns %}
+
+<style>
+  #campaignChart {
+    max-width: 500px;
+    max-height: 500px;
+    margin: auto;
+  }
+  .no-data-row {
+    text-align: center;
+    font-style: italic;
+    color: #6c757d;
+  }
+</style>
+
+<div class="container mt-4">
+
+  <!-- Campaign Name -->
+  <h3>{{ campaign.name }}</h3>
+  <p>Subject: {{ campaign.subject }}</p>
+
+  <!-- Summary Cards -->
+  <div class="row my-3">
+    <div class="col-md-2">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h5>Total</h5>
+          <h4>{{ summary.total }}</h4>
+          <button class="btn btn-sm btn-primary filter-btn" data-status="all">View</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-2">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h5>Sent</h5>
+          <h4>{{ summary.sent }}</h4>
+          <button class="btn btn-sm btn-success filter-btn" data-status="sent">View</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-2">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h5>Failed</h5>
+          <h4>{{ summary.failed }}</h4>
+          <button class="btn btn-sm btn-danger filter-btn" data-status="failed">View</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-2">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h5>Opened</h5>
+          <h4>{{ summary.opened }}</h4>
+          <button class="btn btn-sm btn-warning filter-btn" data-status="opened">View</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-2">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h5>Clicked</h5>
+          <h4>{{ summary.clicked }}</h4>
+          <button class="btn btn-sm btn-info filter-btn" data-status="clicked">View</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graph -->
+  <div class="my-6 text-center">
+    <canvas id="campaignChart"></canvas>
+  </div>
+
+  <!-- Email Table -->
+  <div class="table-responsive">
+    <table class="table table-striped" id="emailTable">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Sent At</th>
+          <th>Opened At</th>
+          <th>Clicked At</th>
+        </tr>
+      </thead>
+      <tbody id="emailTableBody">
+        {% for email in emails %}
+        <tr data-status="{% if email.is_clicked %}clicked{% elif email.is_opened %}opened{% else %}sent{% endif %}">
+          <td>{{ forloop.counter }}</td>
+          <td>{{ email.recipient }}</td>
+          <td>
+            {% if email.is_clicked %}
+              Clicked
+            {% elif email.is_opened %}
+              Opened
+            {% else %}
+              Sent
+            {% endif %}
+          </td>
+          <td>{{ email.sent_at|date:"Y-m-d H:i" }}</td>
+          <td>{{ email.open_timestamp|default:"-"|date:"Y-m-d H:i" }}</td>
+          <td>{{ email.click_timestamp|default:"-"|date:"Y-m-d H:i" }}</td>
+        </tr>
+        {% empty %}
+        <tr id="noDataDefault">
+          <td colspan="6" class="no-data-row">No emails found for this campaign</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById('campaignChart').getContext('2d');
+  const campaignChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ['Sent', 'Failed', 'Opened', 'Clicked'],
+      datasets: [{
+        label: 'Emails',
+        data: [
+          {{ summary.sent }},
+          {{ summary.failed }},
+          {{ summary.opened }},
+          {{ summary.clicked }}
+        ],
+        backgroundColor: [
+          'green',
+          'red',
+          'orange',
+          'blue'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+    }
+  });
+
+  // Filter table rows by button click
+  const buttons = document.querySelectorAll('.filter-btn');
+  const tableBody = document.getElementById('emailTableBody');
+  const tableRows = document.querySelectorAll('#emailTable tbody tr[data-status]');
+  const noDataDefault = document.getElementById('noDataDefault');
+
+  function showNoDataMessage(status) {
+    const message = status === 'all' ? 'No emails found for this campaign' : `No ${status} emails found`;
+    if (!document.getElementById('noDataRow')) {
+      const noDataRow = document.createElement('tr');
+      noDataRow.id = 'noDataRow';
+      noDataRow.innerHTML = `<td colspan="6" class="no-data-row">${message}</td>`;
+      tableBody.appendChild(noDataRow);
+    } else {
+      document.getElementById('noDataRow').querySelector('td').textContent = message;
+    }
+  }
+
+  function hideNoDataMessage() {
+    const noDataRow = document.getElementById('noDataRow');
+    if (noDataRow) {
+      noDataRow.remove();
+    }
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const status = btn.getAttribute('data-status');
+      let visibleRows = 0;
+      
+      tableRows.forEach(row => {
+        if(status === 'all' || row.dataset.status === status){
+          row.style.display = '';
+          visibleRows++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      // Hide default no data message if it exists
+      if (noDataDefault) {
+        noDataDefault.style.display = 'none';
+      }
+
+      // Show/hide custom no data message
+      if (visibleRows === 0) {
+        showNoDataMessage(status);
+      } else {
+        hideNoDataMessage();
+      }
+    });
+  });
+
+  // Initialize - hide default no data message if there are emails
+  document.addEventListener('DOMContentLoaded', function() {
+    if (tableRows.length > 0 && noDataDefault) {
+      noDataDefault.style.display = 'none';
+    }
+  });
+</script>
+{% endblock %} {% endcomment %}
