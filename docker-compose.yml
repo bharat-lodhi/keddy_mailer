@@ -47,6 +47,7 @@ services:
       - media_volume:/app/media
     ports:
       - "8000:8000"
+      - "8443:443"
     restart: always
 
   celery_worker:

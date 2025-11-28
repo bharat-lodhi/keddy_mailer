@@ -1,27 +1,36 @@
 # Dockerfile - Django + Gunicorn + WhiteNoise
 FROM python:3.10-slim
 
+# Environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV POETRY_VIRTUALENVS_CREATE=false
 
+# Set working directory
 WORKDIR /app
 
-# system deps (if needed)
-RUN apt-get update && apt-get install -y build-essential libpq-dev curl && rm -rf /var/lib/apt/lists/*
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    curl \
+    netcat \
+    && rm -rf /var/lib/apt/lists/*
 
-# copy and install python deps
+# Copy and install Python dependencies
 COPY requirements.txt /app/requirements.txt
 RUN pip install --upgrade pip
 RUN pip install -r /app/requirements.txt
 
-# copy project
+# Copy project files
 COPY . /app
 
-# make entrypoint executable
+# Make entrypoint executable
 COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# Expose Django port
 EXPOSE 8000
 
+# Start the container
 CMD ["/entrypoint.sh"]
