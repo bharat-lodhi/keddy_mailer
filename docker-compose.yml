@@ -1,105 +1,95 @@
-version: "3.9"
+version: '3.8'
 
 services:
-  db:
-    image: postgres:15
-    container_name: keddy_postgres
-    env_file:
-      - .env
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:7
-    container_name: redis_server
-    volumes:
-      - redisdata:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  django:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: keddy_django
-    env_file:
-      - .env
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+  web:
+    build: .
+    command: gunicorn --bind 0.0.0.0:8000 --workers 4 --threads 4 --timeout 120 keddy_mailer.wsgi:application
     volumes:
       - .:/app
       - static_volume:/app/staticfiles
       - media_volume:/app/media
+      - logs_volume:/app/logs
     ports:
       - "8000:8000"
-      - "8443:443"
-    restart: always
-
-  celery_worker:
-    build:
-      context: .
-      dockerfile: Dockerfile.worker
-    container_name: keddy_worker
-    env_file:
-      - .env
+    environment:
+      - DEBUG=False
+      - DATABASE_URL=postgresql://keddy_mailer:${DB_PASSWORD}@db:5432/keddy_prod
+      - REDIS_URL=redis://redis:6379/0
+      - DJANGO_SETTINGS_MODULE=keddy_mailer.settings
+      - ALLOWED_HOSTS=keddytech.in,www.keddytech.in,localhost,127.0.0.1
     depends_on:
-      - redis
       - db
-      - django
+      - redis
+    restart: unless-stopped
+    networks:
+      - keddy_network
+
+  celery:
+    build: .
+    command: celery -A keddy_mailer worker --loglevel=info --concurrency=8 --max-tasks-per-child=100
     volumes:
       - .:/app
-    restart: always
-    deploy:
-      restart_policy:
-        condition: on-failure
-
-  celery_beat:
-    build:
-      context: .
-      dockerfile: Dockerfile.beat
-    container_name: keddy_beat
-    env_file:
-      - .env
+      - logs_volume:/app/logs
+    environment:
+      - DEBUG=False
+      - DATABASE_URL=postgresql://keddy_mailer:${DB_PASSWORD}@db:5432/keddy_prod
+      - REDIS_URL=redis://redis:6379/0
+      - DJANGO_SETTINGS_MODULE=keddy_mailer.settings
     depends_on:
-      - redis
       - db
-      - django
+      - redis
+    restart: unless-stopped
+    networks:
+      - keddy_network
+
+  celery-beat:
+    build: .
+    command: celery -A keddy_mailer beat --loglevel=info
     volumes:
       - .:/app
-    restart: always
-
-  nginx:
-    image: nginx:1.25-alpine
-    container_name: keddy_nginx
+      - logs_volume:/app/logs
+    environment:
+      - DEBUG=False
+      - DATABASE_URL=postgresql://keddy_mailer:${DB_PASSWORD}@db:5432/keddy_prod
+      - REDIS_URL=redis://redis:6379/0
+      - DJANGO_SETTINGS_MODULE=keddy_mailer.settings
     depends_on:
-      - django
+      - db
+      - redis
+    restart: unless-stopped
+    networks:
+      - keddy_network
+
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=keddy_prod
+      - POSTGRES_USER=keddy_mailer
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - static_volume:/app/staticfiles:ro
-      - media_volume:/app/media:ro
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./nginx/ssl:/etc/nginx/ssl
-    restart: always
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - keddy_network
+    command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - keddy_network
 
 volumes:
-  pgdata:
-  redisdata:
+  postgres_data:
   static_volume:
   media_volume:
+  logs_volume:
+
+networks:
+  keddy_network:
+    driver: bridge

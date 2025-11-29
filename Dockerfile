@@ -1,36 +1,51 @@
-# Dockerfile - Django + Gunicorn + WhiteNoise
-FROM python:3.10-slim
+# Use official Python runtime as base image
+FROM python:3.11-slim
 
-# Environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-ENV POETRY_VIRTUALENVS_CREATE=false
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+# ENV DJANGO_SETTINGS_MODULE=keddy_mailer.settings
+ENV DJANGO_SETTINGS_MODULE=keddy_mailer.settings_production 
 
-# Set working directory
+# Set work directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies required for PostgreSQL and other packages
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
-    curl \
-    netcat \
+    gcc \
+    g++ \
+    postgresql-dev \
+    python3-dev \
+    musl-dev \
+    libffi-dev \
+    openssl \
+    libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy and install Python dependencies
-COPY requirements.txt /app/requirements.txt
-RUN pip install --upgrade pip
-RUN pip install -r /app/requirements.txt
+# Copy requirements first (for better Docker caching)
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project files
-COPY . /app
+COPY . .
 
-# Make entrypoint executable
-COPY ./entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Create necessary directories
+RUN mkdir -p \
+    logs \
+    staticfiles \
+    media
 
-# Expose Django port
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
+# Expose port
 EXPOSE 8000
 
-# Start the container
-CMD ["/entrypoint.sh"]
+# Create non-root user for security
+RUN useradd -m -r keddyuser && chown -R keddyuser:keddyuser /app
+USER keddyuser
+
+# Start Gunicorn server
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "--threads", "4", "keddy_mailer.wsgi:application"]
