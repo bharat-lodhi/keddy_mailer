@@ -5,7 +5,7 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    command: gunicorn --bind 0.0.0.0:8000 --workers 4 --threads 2 --timeout 120 --access-logfile - keddy_mailer.wsgi:application
+    command: gunicorn --bind 0.0.0.0:8000 --workers 6 --threads 3 --timeout 120 --access-logfile - keddy_mailer.wsgi:application
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
@@ -30,7 +30,7 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    command: celery -A keddy_mailer worker --loglevel=info --concurrency=10 --max-tasks-per-child=50 -Q celery,email_queue
+    command: celery -A keddy_mailer worker --loglevel=info --concurrency=15 --max-tasks-per-child=50 -Q celery,email_queue
     volumes:
       - media_volume:/app/media
       - logs_volume:/app/logs
